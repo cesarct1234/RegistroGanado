@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Tema base del sistema -->
+    <style name="Theme.RegistroGanado" parent="android:Theme.Material.NoActionBar">
+        <!-- Colores del sistema (para Compose ya no se usan estos) -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>
