@@ -76,3 +76,5 @@ fun WelcomeScreen(navController: NavController) {
         }
     }
 }
+
+// annotation class WelcomeScreen

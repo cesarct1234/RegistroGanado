@@ -6,14 +6,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-// 🔹 Importa todas las pantallas desde un único paquete
-import com.caycedo.registroganado.ui.compose.screens.*
-import com.caycedo.registroganado.ui_compose.screens.AddAnimalScreen
+import com.caycedo.registroganado.ui_compose.screens.WelcomeScreen
 import com.caycedo.registroganado.ui_compose.screens.LoginScreen
 import com.caycedo.registroganado.ui_compose.screens.RegisterScreen
-import com.caycedo.registroganado.ui_compose.screens.WelcomeScreen
+import com.caycedo.registroganado.ui.compose.screens.DashboardScreen
+import com.caycedo.registroganado.ui.compose.screens.AnimalListScreen
+import com.caycedo.registroganado.ui_compose.screens.AddAnimalScreen
+import com.caycedo.registroganado.ui.compose.screens.SuppliesScreen
+import com.caycedo.registroganado.ui.compose.screens.AddSupplyScreen
+import com.caycedo.registroganado.ui.compose.screens.EditSupplyScreen
 import com.caycedo.registroganado.ui.compose.screens.ProductionScreen
-
+import com.caycedo.registroganado.ui.compose.screens.ReportsProductionScreen
+import com.caycedo.registroganado.ui.compose.screens.ReportsScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
@@ -34,8 +38,14 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         // 🌾 Registro de insumos
         composable(NavRoutes.SUPPLIES) { SuppliesScreen(navController) }
         composable(NavRoutes.ADD_SUPPLY) { AddSupplyScreen(navController) }
+        composable("${NavRoutes.EDIT_SUPPLY}/{insumoId}") { backStackEntry ->
+            val insumoId = backStackEntry.arguments?.getString("insumoId") ?: ""
+            EditSupplyScreen(navController, insumoId)
+        }
 
         // 🧀 Producción
+        composable(NavRoutes.REPORTS_PRODUCTION) { ReportsProductionScreen(navController) }
+
         composable(NavRoutes.PRODUCTIONS) { ProductionScreen(navController) }
 
         // 📊 Reportes

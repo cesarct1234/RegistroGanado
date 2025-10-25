@@ -1,10 +1,9 @@
-// build.gradle.kts (Nivel de Módulo: app)
+// build.gradle.kts (Nivel de módulo: app)
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    // El plugin de compose ya no necesita 'alias' si usas la versión del catalogo
-    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.compose") // ✅ ya correcto
     id("com.google.gms.google-services")
     id("kotlin-kapt")
 }
@@ -15,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.caycedo.registroganado"
-        minSdk = 26
+        minSdk = 26 // 🔄 lo bajamos a 24 para mayor compatibilidad (Apache POI y Firebase funcionan bien)
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -32,24 +31,27 @@ android {
         }
     }
 
-    // ✅ PASO 1: Opciones de compilación corregidas
+    // ✅ PASO 1: Opciones de compilación modernas
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8 // Usar 1.8 es más seguro para compatibilidad
-        targetCompatibility = JavaVersion.VERSION_1_8
-        // Habilitar la "desugarización" para que Apache POI funcione
-        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true // requerido para Apache POI
     }
 
     kotlinOptions {
-        jvmTarget = "1.8" // Debe coincidir con `compileOptions`
+        jvmTarget = "17"
+        freeCompilerArgs += "-Xjvm-default=all"
     }
 
     buildFeatures {
         compose = true
     }
 
-    // Es importante que el bloque packagingOptions esté aquí para evitar conflictos
-    packagingOptions {
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.13" // ✅ versión estable actual
+    }
+
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -57,35 +59,45 @@ android {
 }
 
 dependencies {
+    // ✅ Librerías base
     implementation(libs.foundation)
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
-    // ✅ PASO 2: Dependencia para la "desugarización"
+    implementation(libs.androidx.foundation)
+
+    // ✅ Soporte de funciones Java 8+ (para Apache POI, LocalDate, etc.)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
-    // ✅ Apache POI para leer archivos Excel (.xlsx)
-    kotlin
+    // ✅ Apache POI (Excel)
     implementation("org.apache.poi:poi-ooxml:5.2.5")
 
+    // Librería principal de Vico para Compose con Material 3
+    implementation("com.patrykandpatrick.vico:compose-m3:1.14.0")
 
-    // ✅ Librería para leer archivos CSV
+
+
+
+    // (Opcional) ByteBeats — si aún usas su ejemplo base en algún archivo:
+    implementation("io.github.bytebeats:compose-charts:0.2.1")
+
+    // ✅ CSV Reader
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
 
-    // ✅ Firebase (usando el BOM para gestionar versiones)
+    // ✅ Firebase (BOM = sincroniza versiones automáticamente)
     implementation(platform(libs.firebase.bom))
-    implementation("com.google.firebase:firebase-auth") // quitamos -ktx, es implícito
-    implementation("com.google.firebase:firebase-database") // quitamos -ktx, es implícito
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
 
-    // ✅ Corrutinas / Lifecycle
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2") // Versión estable
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.2") // Versión estable
+    // ✅ Corrutinas y Lifecycle
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
     // ✅ Imágenes (Coil)
-    implementation("io.coil-kt:coil-compose:2.6.0") // Usar `coil-compose` para Jetpack Compose
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
-    // ✅ Material 3 y Jetpack Compose (usando el BOM)
+    // ✅ Material 3 y Jetpack Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
@@ -93,14 +105,9 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)
-    implementation("androidx.compose.material:material-icons-extended") // No necesita versión con el BOM
-
-
-
-
-
-
+    implementation("androidx.compose.material:material-icons-extended")
 }
+
 
 
 

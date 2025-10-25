@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,8 +35,12 @@ fun SuppliesScreen(navController: NavController) {
     val database = FirebaseDatabase.getInstance().getReference("insumos").child(userId)
 
     var insumos by remember { mutableStateOf(listOf<Insumo>()) }
+    var filteredList by remember { mutableStateOf(listOf<Insumo>()) }
+    var searchQuery by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+    var insumoToDelete by remember { mutableStateOf<Insumo?>(null) }
 
-    // 🔄 Escucha de datos en tiempo real
+    // 🔄 Cargar datos desde Firebase
     LaunchedEffect(Unit) {
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -44,12 +50,23 @@ fun SuppliesScreen(navController: NavController) {
                     if (insumo != null) lista.add(insumo)
                 }
                 insumos = lista
+                filteredList = lista
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                println("Error Firebase: ${error.message}")
-            }
+            override fun onCancelled(error: DatabaseError) {}
         })
+    }
+
+    // 🔍 Filtro en tiempo real
+    LaunchedEffect(searchQuery, insumos) {
+        filteredList = if (searchQuery.isBlank()) {
+            insumos
+        } else {
+            insumos.filter {
+                it.nombre.contains(searchQuery, ignoreCase = true) ||
+                        it.unidad.contains(searchQuery, ignoreCase = true)
+            }
+        }
     }
 
     Scaffold(
@@ -75,33 +92,85 @@ fun SuppliesScreen(navController: NavController) {
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            if (insumos.isEmpty()) {
+            // 🔍 Barra de búsqueda
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Buscar insumo por nombre o unidad") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                singleLine = true
+            )
+
+            if (filteredList.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay insumos registrados aún 🌾")
+                    Text("No se encontraron insumos 🔎")
                 }
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(insumos) { insumo ->
-                        InsumoCard(insumo)
+                    items(filteredList) { insumo ->
+                        InsumoCard(
+                            insumo = insumo,
+                            onEdit = { navController.navigate("${NavRoutes.EDIT_SUPPLY}/${insumo.id}") },
+                            onDelete = {
+                                insumoToDelete = insumo
+                                showDialog = true
+                            }
+                        )
                     }
                 }
             }
         }
     }
+
+    // ⚠️ Confirmación de eliminación
+    if (showDialog && insumoToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Eliminar insumo") },
+            text = { Text("¿Seguro que deseas eliminar '${insumoToDelete?.nombre}'?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    insumoToDelete?.let { database.child(it.id).removeValue() }
+                    showDialog = false
+                }) { Text("Eliminar", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) { Text("Cancelar") }
+            }
+        )
+    }
 }
 
 @Composable
-fun InsumoCard(insumo: Insumo) {
+fun InsumoCard(insumo: Insumo, onEdit: () -> Unit, onDelete: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "🌾 ${insumo.nombre}", fontWeight = FontWeight.Bold)
-            Text(text = "Cantidad: ${insumo.cantidad} ${insumo.unidad}")
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(text = "🌾 ${insumo.nombre}", fontWeight = FontWeight.Bold)
+                Text(text = "Cantidad: ${insumo.cantidad} ${insumo.unidad}")
+                if (insumo.descripcion.isNotEmpty()) {
+                    Text(text = "📝 ${insumo.descripcion}")
+                }
+            }
+            Row {
+                IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, contentDescription = "Editar") }
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = MaterialTheme.colorScheme.error)
+                }
+            }
         }
     }
 }
-
 
