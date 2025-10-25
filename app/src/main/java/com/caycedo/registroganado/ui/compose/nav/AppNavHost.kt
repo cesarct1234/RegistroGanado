@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
+// ✅ Importaciones correctas y actualizadas
 import com.caycedo.registroganado.ui_compose.screens.WelcomeScreen
 import com.caycedo.registroganado.ui_compose.screens.LoginScreen
 import com.caycedo.registroganado.ui_compose.screens.RegisterScreen
@@ -44,12 +45,11 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         }
 
         // 🧀 Producción
-        composable(NavRoutes.REPORTS_PRODUCTION) { ReportsProductionScreen(navController) }
-
         composable(NavRoutes.PRODUCTIONS) { ProductionScreen(navController) }
 
         // 📊 Reportes
         composable(NavRoutes.REPORTS) { ReportsScreen(navController) }
+        composable(NavRoutes.REPORTS_PRODUCTION) { ReportsProductionScreen(navController) }
     }
 }
 

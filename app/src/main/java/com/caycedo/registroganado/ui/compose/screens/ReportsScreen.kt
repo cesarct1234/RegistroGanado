@@ -17,7 +17,6 @@ import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.column.columnChart
-//import com.patrykandpatrick.vico.compose.chart.pie.pieChart
 import com.patrykandpatrick.vico.core.axis.AxisPosition
 import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
@@ -45,7 +44,6 @@ fun ReportsScreen(navController: NavController) {
 
     // Datos para gráficos
     val insumoBarChartProducer = remember { ChartEntryModelProducer() }
-    val insumoPieChartProducer = remember { ChartEntryModelProducer() }
     var unidadesLabels by remember { mutableStateOf<List<String>>(emptyList()) }
 
     LaunchedEffect(Unit) {
@@ -84,9 +82,6 @@ fun ReportsScreen(navController: NavController) {
 
             // Datos para gráficos
             insumoBarChartProducer.setEntries(
-                unidadesSorted.mapIndexed { index, entry -> entryOf(index.toFloat(), entry.value.toFloat()) }
-            )
-            insumoPieChartProducer.setEntries(
                 unidadesSorted.mapIndexed { index, entry -> entryOf(index.toFloat(), entry.value.toFloat()) }
             )
 
@@ -153,19 +148,6 @@ fun ReportsScreen(navController: NavController) {
                             modifier = Modifier.height(250.dp)
                         )
                     }
-
-                    /* 🥧 Gráfico circular (PieChart de Vico)
-                    item {
-                        Text("🥧 Distribución de insumos por unidad", fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Chart(
-                            chart = pieChart(),
-                            chartModelProducer = insumoPieChartProducer,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(250.dp)
-                        )
-                    } */
                 }
             }
         }
@@ -185,11 +167,3 @@ fun ReportCard(titulo: String, valor: String) {
         }
     }
 }
-
-
-
-
-
-
-
-

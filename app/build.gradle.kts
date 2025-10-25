@@ -3,7 +3,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("org.jetbrains.kotlin.plugin.compose") // ✅ ya correcto
+    id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.gms.google-services")
     id("kotlin-kapt")
 }
@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.caycedo.registroganado"
-        minSdk = 26 // 🔄 lo bajamos a 24 para mayor compatibilidad (Apache POI y Firebase funcionan bien)
+        minSdk = 24 // Compatibilidad ampliada
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -31,11 +31,11 @@ android {
         }
     }
 
-    // ✅ PASO 1: Opciones de compilación modernas
+    // ✅ Opciones modernas de compilación
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true // requerido para Apache POI
+        isCoreLibraryDesugaringEnabled = true // Requerido para Apache POI
     }
 
     kotlinOptions {
@@ -48,7 +48,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13" // ✅ versión estable actual
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
 
     packaging {
@@ -64,32 +64,30 @@ dependencies {
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
-    implementation(libs.androidx.foundation)
+    implementation(libs.foundation)
 
-    // ✅ Soporte de funciones Java 8+ (para Apache POI, LocalDate, etc.)
+
+    // ✅ Desugarización (soporte de Java 8+)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     // ✅ Apache POI (Excel)
     implementation("org.apache.poi:poi-ooxml:5.2.5")
 
-    // Librería principal de Vico para Compose con Material 3
+    // ✅ Vico Charts (gráficos profesionales)
     implementation("com.patrykandpatrick.vico:compose-m3:1.14.0")
 
-
-
-
-    // (Opcional) ByteBeats — si aún usas su ejemplo base en algún archivo:
+    // (Opcional) ByteBeats (antiguo gráfico)
     implementation("io.github.bytebeats:compose-charts:0.2.1")
 
     // ✅ CSV Reader
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
 
-    // ✅ Firebase (BOM = sincroniza versiones automáticamente)
+    // ✅ Firebase
     implementation(platform(libs.firebase.bom))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-database")
 
-    // ✅ Corrutinas y Lifecycle
+    // ✅ Corrutinas / Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
@@ -97,7 +95,7 @@ dependencies {
     // ✅ Imágenes (Coil)
     implementation("io.coil-kt:coil-compose:2.6.0")
 
-    // ✅ Material 3 y Jetpack Compose
+    // ✅ Material 3 y Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
@@ -107,10 +105,3 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation("androidx.compose.material:material-icons-extended")
 }
-
-
-
-
-
-
-

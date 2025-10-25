@@ -47,10 +47,9 @@ fun ProductionScreen(navController: NavController) {
     var nombreAnimal by remember { mutableStateOf("") }
     var litrosLeche by remember { mutableStateOf("") }
     var observaciones by remember { mutableStateOf("") }
-
     var isSaving by remember { mutableStateOf(false) }
 
-    // 🗓️ Selector de fecha (seguro)
+    // 🗓️ Selector de fecha
     fun abrirDatePicker(onDateSelected: (String) -> Unit) {
         val calendario = Calendar.getInstance()
         DatePickerDialog(
@@ -85,23 +84,20 @@ fun ProductionScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // 📅 Fecha — sin clickable directo
+
+            // 📅 Fecha (editable o seleccionable)
             OutlinedTextField(
                 value = fecha,
-                onValueChange = { fecha = it }, // ✅ Permite escribir manualmente
+                onValueChange = { fecha = it },
                 label = { Text("Fecha (dd/mm/aaaa)") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() }
-                    ) {
-                        abrirDatePicker { fecha = it } // ✅ Permite también seleccionar
+                    .noRippleClickable {
+                        abrirDatePicker { fecha = it }
                     },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true
             )
-
 
             OutlinedTextField(
                 value = idAnimal,
@@ -174,7 +170,7 @@ fun ProductionScreen(navController: NavController) {
 }
 
 /**
- * 🧩 Extensión auxiliar: clickable sin ripple (corrige el crash de Compose 1.7+)
+ * 🧩 Extensión auxiliar: clickable sin ripple (corrige crash en Compose 1.7+)
  */
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
     this.then(

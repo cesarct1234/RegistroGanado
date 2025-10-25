@@ -129,7 +129,7 @@ fun DashboardCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(65.dp) // ✅ Más compacto
+            .height(65.dp)
             .clickable(
                 indication = null,
                 interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
@@ -142,13 +142,11 @@ fun DashboardCard(
                 .background(Brush.linearGradient(colors))
                 .padding(horizontal = 20.dp, vertical = 8.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     icon,
                     contentDescription = title,
-                    tint = Color(0xFF1A237E), // ✅ Contraste alto
+                    tint = Color(0xFF1A237E),
                     modifier = Modifier.size(28.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -156,7 +154,7 @@ fun DashboardCard(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A237E) // ✅ Texto visible
+                        color = Color(0xFF1A237E)
                     )
                 )
             }

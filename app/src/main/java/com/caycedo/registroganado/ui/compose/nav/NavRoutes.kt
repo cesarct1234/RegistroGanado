@@ -10,23 +10,17 @@ object NavRoutes {
     const val LIST_ANIMALS = "animals"
     const val ADD_ANIMAL = "addAnimal"
 
-
-
     // 🌾 Insumos
     const val SUPPLIES = "supplies"
     const val ADD_SUPPLY = "addSupply"
-    const val EDIT_SUPPLY = "editSupply"
-
+    const val EDIT_SUPPLY = "editSupply" // ✅ para edición de insumos
 
     // 🧀 Producción
     const val PRODUCTIONS = "productions"
 
     // 📊 Reportes
     const val REPORTS = "reports"
-    const val REPORTS_PRODUCTION = "reports_production" // ✅ nueva ruta
-
-
-
+    const val REPORTS_PRODUCTION = "reports_production" // ✅ nueva ruta para reportes por producción
 }
 
 

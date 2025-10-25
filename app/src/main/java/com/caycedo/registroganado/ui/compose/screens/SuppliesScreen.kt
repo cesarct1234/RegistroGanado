@@ -40,7 +40,7 @@ fun SuppliesScreen(navController: NavController) {
     var showDialog by remember { mutableStateOf(false) }
     var insumoToDelete by remember { mutableStateOf<Insumo?>(null) }
 
-    // 🔄 Cargar datos desde Firebase
+    // 🔄 Cargar datos en tiempo real desde Firebase
     LaunchedEffect(Unit) {
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -53,11 +53,13 @@ fun SuppliesScreen(navController: NavController) {
                 filteredList = lista
             }
 
-            override fun onCancelled(error: DatabaseError) {}
+            override fun onCancelled(error: DatabaseError) {
+                println("❌ Error Firebase: ${error.message}")
+            }
         })
     }
 
-    // 🔍 Filtro en tiempo real
+    // 🔍 Filtro de búsqueda en tiempo real
     LaunchedEffect(searchQuery, insumos) {
         filteredList = if (searchQuery.isBlank()) {
             insumos
@@ -124,7 +126,7 @@ fun SuppliesScreen(navController: NavController) {
         }
     }
 
-    // ⚠️ Confirmación de eliminación
+    // ⚠️ Diálogo de confirmación de eliminación
     if (showDialog && insumoToDelete != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -134,10 +136,14 @@ fun SuppliesScreen(navController: NavController) {
                 TextButton(onClick = {
                     insumoToDelete?.let { database.child(it.id).removeValue() }
                     showDialog = false
-                }) { Text("Eliminar", color = MaterialTheme.colorScheme.error) }
+                }) {
+                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("Cancelar") }
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancelar")
+                }
             }
         )
     }
@@ -165,12 +171,17 @@ fun InsumoCard(insumo: Insumo, onEdit: () -> Unit, onDelete: () -> Unit) {
                 }
             }
             Row {
-                IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, contentDescription = "Editar") }
+                IconButton(onClick = onEdit) {
+                    Icon(Icons.Default.Edit, contentDescription = "Editar")
+                }
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = MaterialTheme.colorScheme.error)
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Eliminar",
+                        tint = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         }
     }
 }
-
