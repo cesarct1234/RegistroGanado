@@ -16,9 +16,11 @@ import com.caycedo.registroganado.ui_compose.screens.AddAnimalScreen
 import com.caycedo.registroganado.ui.compose.screens.SuppliesScreen
 import com.caycedo.registroganado.ui.compose.screens.AddSupplyScreen
 import com.caycedo.registroganado.ui.compose.screens.EditSupplyScreen
+import com.caycedo.registroganado.ui.compose.screens.GenerateReportScreen
 import com.caycedo.registroganado.ui.compose.screens.ProductionScreen
 import com.caycedo.registroganado.ui.compose.screens.ReportsProductionScreen
 import com.caycedo.registroganado.ui.compose.screens.ReportsScreen
+
 
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
@@ -50,6 +52,8 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         // 📊 Reportes
         composable(NavRoutes.REPORTS) { ReportsScreen(navController) }
         composable(NavRoutes.REPORTS_PRODUCTION) { ReportsProductionScreen(navController) }
+        composable(NavRoutes.REPORTS_EXPORT) { GenerateReportScreen(navController) }
+
     }
 }
 

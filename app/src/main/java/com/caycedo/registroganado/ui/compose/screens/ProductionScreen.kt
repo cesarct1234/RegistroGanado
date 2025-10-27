@@ -172,11 +172,12 @@ fun ProductionScreen(navController: NavController) {
 /**
  * 🧩 Extensión auxiliar: clickable sin ripple (corrige crash en Compose 1.7+)
  */
-fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
-    this.then(
-        Modifier.clickable(
-            indication = null,
-            interactionSource = remember { MutableInteractionSource() }
-        ) { onClick() }
-    )
+fun Modifier.noRippleClickable2(onClick: () -> Unit): Modifier = composed {
+    clickable(
+        indication = null,
+        interactionSource = remember { MutableInteractionSource() }
+    ) {
+        onClick()
+    }
 }
+

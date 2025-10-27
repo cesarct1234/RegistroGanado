@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.caycedo.registroganado"
-        minSdk = 24 // Compatibilidad ampliada
+        minSdk = 26 // Compatibilidad ampliada
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"

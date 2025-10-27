@@ -115,6 +115,12 @@ fun DashboardScreen(navController: NavController) {
                 icon = Icons.Outlined.MonitorWeight,
                 colors = listOf(Color(0xFF4DD0E1), Color(0xFFB2EBF2))
             ) { navController.navigate(NavRoutes.REPORTS_PRODUCTION) }
+
+            DashboardCard(
+                title = "Exportar Reportes",
+                icon = Icons.Outlined.MonitorWeight,
+                colors = listOf(Color(0xFF6A1B9A), Color(0xFFB2EBF2))
+            ) {  navController.navigate(NavRoutes.REPORTS_EXPORT)}
         }
     }
 }

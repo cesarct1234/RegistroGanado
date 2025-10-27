@@ -21,6 +21,7 @@ object NavRoutes {
     // 📊 Reportes
     const val REPORTS = "reports"
     const val REPORTS_PRODUCTION = "reports_production" // ✅ nueva ruta para reportes por producción
+    const val REPORTS_EXPORT = "reports_export"   // <--- NUEVA
 }
 
 
