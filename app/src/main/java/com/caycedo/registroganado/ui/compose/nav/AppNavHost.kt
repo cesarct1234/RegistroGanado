@@ -36,7 +36,18 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
 
         // 🐮 Gestión de animales
         composable(NavRoutes.LIST_ANIMALS) { AnimalListScreen(navController) }
+
         composable(NavRoutes.ADD_ANIMAL) { AddAnimalScreen(navController) }
+
+        composable("${NavRoutes.ADD_ANIMAL}/{animalId}") { backStackEntry ->
+            val animalId = backStackEntry.arguments?.getString("animalId") ?: ""
+            AddAnimalScreen(navController, animalId)
+        }
+
+        // composable(NavRoutes.ADD_ANIMAL) { AddAnimalScreen(navController) }
+
+
+
 
         // 🌾 Registro de insumos
         composable(NavRoutes.SUPPLIES) { SuppliesScreen(navController) }

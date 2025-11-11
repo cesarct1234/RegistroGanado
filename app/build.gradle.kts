@@ -104,4 +104,9 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)
     implementation("androidx.compose.material:material-icons-extended")
+    // ✅ LiveData + Compose Integration (necesario para observeAsState)
+    implementation("androidx.compose.runtime:runtime-livedata:1.7.5")
+    implementation("androidx.compose.foundation:foundation:1.7.0")
+    implementation("androidx.compose.material3:material3:1.2.1")
+
 }
