@@ -1,12 +1,14 @@
 package com.caycedo.registroganado.ui_compose.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -18,10 +20,9 @@ import androidx.navigation.NavController
 import com.caycedo.registroganado.R
 import com.caycedo.registroganado.ui.compose.nav.NavRoutes
 
-//import com.caycedo.registroganado.ui_compose.nav.NavRoutes
-
 @Composable
 fun WelcomeScreen(navController: NavController) {
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -32,14 +33,13 @@ fun WelcomeScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // 🐮 Logo del proyecto
+
             Image(
                 painter = painterResource(id = R.drawable.imagen),
                 contentDescription = "Logo del Proyecto",
                 modifier = Modifier.size(180.dp)
             )
 
-            // 🏷️ Título
             Text(
                 text = "Registro de Ganado",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -49,7 +49,6 @@ fun WelcomeScreen(navController: NavController) {
                 textAlign = TextAlign.Center
             )
 
-            // 💬 Subtítulo o frase
             Text(
                 text = "Gestiona tu finca fácilmente: controla animales, producción e insumos en tiempo real.",
                 style = MaterialTheme.typography.bodyMedium.copy(
@@ -61,12 +60,13 @@ fun WelcomeScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            // 🔘 Botón principal
+            // 🔘 BOTÓN SIN RIPPLE (SOLUCIÓN AL CRASH)
             Button(
                 onClick = { navController.navigate(NavRoutes.LOGIN) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
+                interactionSource = remember { MutableInteractionSource() },
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .height(50.dp)
@@ -76,7 +76,4 @@ fun WelcomeScreen(navController: NavController) {
         }
     }
 }
-
-
-// annotation class WelcomeScreen
 

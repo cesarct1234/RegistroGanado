@@ -2,30 +2,48 @@ package com.caycedo.registroganado.ui.compose.nav
 
 object NavRoutes {
 
-    // 🏠 Pantallas principales
+    // ===============================
+    // 🧩  AUTH / INICIO
+    // ===============================
     const val WELCOME = "welcome"
     const val LOGIN = "login"
     const val REGISTER = "register"
 
-    // 📋 Dashboard
-    const val DASHBOARD = "dashboard"
 
-    // 🐮 Animales
+    // ===============================
+    // 👤  HOME SEGÚN ROL
+    // ===============================
+    const val ADMIN_HOME = "adminHome"
+    const val VET_HOME = "vetHome"
+    const val CUIDADOR_HOME = "cuidadorHome"
+    const val PROP_HOME = "propHome"
+
+
+    // ===============================
+    // 🐮  ANIMALES
+    // ===============================
     const val LIST_ANIMALS = "listAnimals"
-    const val ADD_ANIMAL = "addAnimal"  // se usa también para editar con parámetro {animalId}
 
-    // 🌾 Insumos
+    // Crear o editar animal (para editar se usa: addAnimal/{id})
+    const val ADD_ANIMAL = "addAnimal"
+
+
+    // ===============================
+    // 🌾  INSUMOS
+    // ===============================
     const val SUPPLIES = "supplies"
     const val ADD_SUPPLY = "addSupply"
+
+    // Editar insumo → editSupply/{id}
     const val EDIT_SUPPLY = "editSupply"
 
-    // 🧀 Producción
+
+    // ===============================
+    // 🧀  PRODUCCIÓN / REPORTES
+    // ===============================
     const val PRODUCTIONS = "productions"
 
-    // 📊 Reportes
     const val REPORTS = "reports"
     const val REPORTS_PRODUCTION = "reportsProduction"
     const val REPORTS_EXPORT = "reportsExport"
 }
-
-
