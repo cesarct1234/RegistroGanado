@@ -1,5 +1,7 @@
 package com.caycedo.registroganado.ui_compose.screens
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,12 +12,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.caycedo.registroganado.R
 import com.caycedo.registroganado.ui.compose.nav.NavRoutes
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -32,22 +38,37 @@ fun LoginScreen(navController: NavController) {
     var message by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
+    // 🟩 FONDO VERDE SUAVE PARA TODA LA PANTALLA
+    val backgroundColor = Color(0xFFC7E6B5) // verde muy suave pastel
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Iniciar Sesión", fontWeight = FontWeight.Bold) }
             )
-        }
+        },
+        containerColor = backgroundColor
     ) { innerPadding ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(backgroundColor) // <- mantiene el fondo incluso detrás de barras
                 .padding(innerPadding)
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            // 🐄 IMAGEN AJUSTADA Y CENTRADA AGRADABLEMENTE
+            Image(
+                painter = painterResource(id = R.drawable.imginiciarsesion),
+                contentDescription = "Logo del Proyecto",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(200.dp)
+                    .padding(bottom = 20.dp)
+            )
 
             OutlinedTextField(
                 value = email,
@@ -72,7 +93,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 🔵 BOTÓN SIN RIPPLE (IMPORTANTE)
             Button(
                 onClick = {
 
@@ -123,13 +143,14 @@ fun LoginScreen(navController: NavController) {
 
                 },
                 enabled = !isLoading,
-                interactionSource = remember { MutableInteractionSource() }, // <- evita ripple
-                modifier = Modifier.fillMaxWidth()
+                interactionSource = remember { MutableInteractionSource() }, // evita ripple
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
             ) {
                 Text(if (isLoading) "Cargando..." else "Entrar")
             }
 
-            // 🔵 TextButton también sin ripple
             TextButton(
                 onClick = { navController.navigate(NavRoutes.REGISTER) },
                 interactionSource = remember { MutableInteractionSource() }

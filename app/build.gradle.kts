@@ -64,7 +64,7 @@ dependencies {
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
-
+    implementation(libs.ui.text)
 
 
     // ✅ Desugarización (soporte de Java 8+)

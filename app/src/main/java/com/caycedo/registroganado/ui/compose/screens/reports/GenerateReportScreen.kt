@@ -1,4 +1,4 @@
-package com.caycedo.registroganado.ui.compose.screens
+package com.caycedo.registroganado.ui.compose.screens.reports
 
 import android.app.DatePickerDialog
 import android.content.Context
@@ -20,6 +20,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -303,7 +304,7 @@ private suspend fun generatePdf(
 }
 
 private fun sharePdf(ctx: Context, file: File) {
-    val uri: Uri = androidx.core.content.FileProvider.getUriForFile(
+    val uri: Uri = FileProvider.getUriForFile(
         ctx,
         ctx.packageName + ".provider",
         file

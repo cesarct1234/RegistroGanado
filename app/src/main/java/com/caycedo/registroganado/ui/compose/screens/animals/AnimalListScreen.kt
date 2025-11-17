@@ -34,10 +34,10 @@ data class Animal(
     val estadoReproductivo: String = "",
     val ultimoParto: String = "",
     val produccionLeche: String = "",
+    val tipoProduccion: String = "",
     val vacunas: String = "",
     val tratamientos: String = "",
     val observaciones: String = "",
-    val tipoProduccion: String = "",
     val aptoConsumo: Boolean = false,
     val propietarioId: String = "",
     val activo: Boolean = true
@@ -56,7 +56,6 @@ fun AnimalListScreen(navController: NavController) {
 
     var myRole by remember { mutableStateOf("") }
     var listaAnimales by remember { mutableStateOf(listOf<Animal>()) }
-
     var filtro by remember { mutableStateOf("Activos") }
 
     // Obtener rol del usuario
@@ -73,31 +72,21 @@ fun AnimalListScreen(navController: NavController) {
 
         val temp = mutableListOf<Animal>()
 
-        when (myRole) {
+        dbAnimals.get().addOnSuccessListener { snap ->
+            for (animalNode in snap.children) {
+                val a = animalNode.getValue(Animal::class.java) ?: continue
 
-            "administrador" -> {
-                dbAnimals.get().addOnSuccessListener { snap ->
-                    for (propNode in snap.children) {
-                        for (animalNode in propNode.children) {
-                            val a = animalNode.getValue(Animal::class.java)
-                            if (a != null) {
-                                when (filtro) {
-                                    "Activos" -> if (a.activo) temp.add(a)
-                                    "Inactivos" -> if (!a.activo) temp.add(a)
-                                    else -> temp.add(a)
-                                }
-                            }
+                // Filtrado por rol
+                when (myRole) {
+                    "administrador" -> {
+                        when (filtro) {
+                            "Activos" -> if (a.activo) temp.add(a)
+                            "Inactivos" -> if (!a.activo) temp.add(a)
+                            else -> temp.add(a)
                         }
                     }
-                    listaAnimales = temp
-                }
-            }
-
-            "propietario" -> {
-                dbAnimals.child(myUid).get().addOnSuccessListener { snap ->
-                    for (animalNode in snap.children) {
-                        val a = animalNode.getValue(Animal::class.java)
-                        if (a != null) {
+                    "propietario" -> {
+                        if (a.propietarioId == myUid) {
                             when (filtro) {
                                 "Activos" -> if (a.activo) temp.add(a)
                                 "Inactivos" -> if (!a.activo) temp.add(a)
@@ -105,21 +94,13 @@ fun AnimalListScreen(navController: NavController) {
                             }
                         }
                     }
-                    listaAnimales = temp
+                    "veterinario", "cuidador" -> {
+                        if (a.activo) temp.add(a)
+                    }
                 }
             }
 
-            "veterinario", "cuidador" -> {
-                dbAnimals.get().addOnSuccessListener { snap ->
-                    for (propNode in snap.children) {
-                        for (animalNode in propNode.children) {
-                            val a = animalNode.getValue(Animal::class.java)
-                            if (a != null && a.activo) temp.add(a)
-                        }
-                    }
-                    listaAnimales = temp
-                }
-            }
+            listaAnimales = temp
         }
     }
 
@@ -129,8 +110,6 @@ fun AnimalListScreen(navController: NavController) {
                 title = { Text("Gestión de Animales", fontWeight = FontWeight.Bold) },
                 actions = {
                     if (myRole != "cuidador" && myRole != "veterinario") {
-
-                        // 🚫 REEMPLAZO TOTAL DE ICONBUTTON → SEGURO
                         Box(
                             modifier = Modifier
                                 .size(46.dp)
@@ -172,14 +151,12 @@ fun AnimalListScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(10.dp))
 
             if (listaAnimales.isEmpty()) {
-
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("No hay animales registrados")
                 }
-
             } else {
 
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -198,7 +175,6 @@ fun AnimalCard(
     role: String,
     navController: NavController
 ) {
-
     val context = LocalContext.current
     val dbAnimals = FirebaseDatabase.getInstance().getReference("animales")
 
@@ -207,7 +183,7 @@ fun AnimalCard(
         colors = CardDefaults.cardColors(
             containerColor =
                 if (animal.activo) MaterialTheme.colorScheme.surfaceVariant
-                else MaterialTheme.colorScheme.surfaceVariant.copy(0.5f)
+                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
     ) {
         Column(Modifier.padding(14.dp)) {
@@ -226,7 +202,7 @@ fun AnimalCard(
 
                 Row {
 
-                    // ✏ EDITAR → Reemplazo seguro
+                    // EDITAR
                     if (animal.activo && (role == "administrador" || role == "propietario")) {
 
                         Box(
@@ -236,7 +212,7 @@ fun AnimalCard(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null
                                 ) {
-                                    navController.navigate("${NavRoutes.ADD_ANIMAL}/${animal.id}")
+                                    navController.navigate("${NavRoutes.ADD_ANIMAL}/${animal.propietarioId}/${animal.id}")
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -244,7 +220,7 @@ fun AnimalCard(
                         }
                     }
 
-                    // 🔄 Activar / Desactivar
+                    // ACTIVAR / DESACTIVAR
                     if (role == "administrador" || role == "propietario") {
 
                         Box(
@@ -254,15 +230,12 @@ fun AnimalCard(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null
                                 ) {
-                                    val nuevo = !animal.activo
-
-                                    dbAnimals.child(animal.propietarioId)
-                                        .child(animal.id)
-                                        .child("activo").setValue(nuevo)
+                                    val nuevoValor = !animal.activo
+                                    dbAnimals.child(animal.id).child("activo").setValue(nuevoValor)
 
                                     Toast.makeText(
                                         context,
-                                        if (nuevo) "Animal activado" else "Animal desactivado",
+                                        if (nuevoValor) "Animal activado" else "Animal desactivado",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 },
@@ -281,12 +254,10 @@ fun AnimalCard(
 
             Text("Raza: ${animal.raza}")
             Text("Sexo: ${animal.sexo}")
-            Text("Tipo: ${animal.tipoProduccion}")
+            Text("Producción: ${animal.tipoProduccion}")
             Text("Peso: ${animal.peso} kg")
         }
     }
 }
-
-
 
 

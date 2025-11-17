@@ -1,5 +1,7 @@
 package com.caycedo.registroganado.ui_compose.screens.roles
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -10,9 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.caycedo.registroganado.R
 import com.caycedo.registroganado.ui.compose.nav.NavRoutes
 import com.google.firebase.auth.FirebaseAuth
 
@@ -43,17 +48,28 @@ fun AdminHomeScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color(0xFFB7E4A5)) // ✅ Fondo verde bonito
                 .padding(padding)
                 .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            // ✅ Imagen agregada arriba del panel
+            Image(
+                painter = painterResource(id = R.drawable.imglogin),
+                contentDescription = "Imagen decorativa",
+                modifier = Modifier
+                    .size(180.dp)
+                    .padding(top = 10.dp)
+            )
 
             AdminItem(
                 title = "Gestión de Usuarios",
                 description = "Crear, editar y administrar roles",
                 icon = Icons.Default.Group
             ) {
-                navController.navigate("gestionUsuarios")
+                navController.navigate(NavRoutes.USERS_MANAGEMENT)
             }
 
             AdminItem(

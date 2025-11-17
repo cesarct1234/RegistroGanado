@@ -1,4 +1,4 @@
-package com.caycedo.registroganado.ui.compose.screens
+package com.caycedo.registroganado.ui.compose.screens.supplies
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions

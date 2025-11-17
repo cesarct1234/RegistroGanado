@@ -3,6 +3,7 @@ package com.caycedo.registroganado.ui.compose.screens
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
+import com.caycedo.registroganado.ui.compose.screens.animals.Animal
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
