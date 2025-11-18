@@ -6,4 +6,7 @@
     <external-files-path
         name="external_reports_subdir"
         path="Download/reports/" />
+    <external-files-path
+        name="external_files"
+        path="." />
 </paths>

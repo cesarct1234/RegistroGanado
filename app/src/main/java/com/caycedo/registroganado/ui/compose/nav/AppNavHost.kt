@@ -5,8 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.caycedo.registroganado.ui.compose.screens.AnimalListScreen
+
 import com.caycedo.registroganado.ui.compose.screens.ProductionScreen
+import com.caycedo.registroganado.ui.compose.screens.animals.AddAnimalScreen
+import com.caycedo.registroganado.ui.compose.screens.animals.AnimalListScreen
 import com.caycedo.registroganado.ui.compose.screens.reports.GenerateReportScreen
 import com.caycedo.registroganado.ui.compose.screens.reports.ReportsProductionScreen
 import com.caycedo.registroganado.ui.compose.screens.reports.ReportsScreen
@@ -29,6 +31,8 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         //------------------------------------
         // AUTH
         //------------------------------------
+
+
         composable(NavRoutes.WELCOME) { WelcomeScreen(navController) }
         composable(NavRoutes.LOGIN) { LoginScreen(navController) }
         composable(NavRoutes.REGISTER) { RegisterScreen(navController) }
@@ -58,11 +62,17 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
 
         composable(NavRoutes.ADD_ANIMAL) { AddAnimalScreen(navController) }
 
-        composable("${NavRoutes.ADD_ANIMAL}/{propId}/{animalId}") { backStackEntry ->
-            val propId = backStackEntry.arguments?.getString("propId") ?: ""
+        composable("${NavRoutes.REPORTE_ANIMAL}/{animalId}") { backStackEntry ->
             val animalId = backStackEntry.arguments?.getString("animalId") ?: ""
-            AddAnimalScreen(navController, propId, animalId)
+            ReporteAnimalScreen(navController, animalId)
         }
+
+        composable("${NavRoutes.ADD_ANIMAL}/{animalId}") { backStack ->
+            val animalId = backStack.arguments?.getString("animalId")
+            AddAnimalScreen(navController, animalIdParam = animalId)
+        }
+
+
 
         //------------------------------------
         // INSUMOS
@@ -81,7 +91,22 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         composable(NavRoutes.REPORTS) { ReportsScreen(navController) }
         composable(NavRoutes.REPORTS_PRODUCTION) { ReportsProductionScreen(navController) }
         composable(NavRoutes.REPORTS_EXPORT) { GenerateReportScreen(navController) }
+        composable(NavRoutes.EXCEL_IMPORT) { GenerateReportScreen(navController) }
+
+
     }
 }
+
+@Composable
+fun DashboardScreen() {
+    TODO("Not yet implemented")
+}
+
+@Composable
+fun ReporteAnimalScreen(x0: NavHostController, x1: String) {
+    TODO("Not yet implemented")
+}
+
+
 
 

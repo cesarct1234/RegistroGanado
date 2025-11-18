@@ -65,6 +65,8 @@ dependencies {
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.ui.text)
+    implementation(libs.animation)
+    //implementation(libs.pdf.viewer)
 
 
     // ✅ Desugarización (soporte de Java 8+)
@@ -74,13 +76,25 @@ dependencies {
     implementation("org.apache.poi:poi-ooxml:5.2.5")
 
     // ✅ Vico Charts (gráficos profesionales)
-    implementation("com.patrykandpatrick.vico:compose-m3:1.14.0")
+
+        implementation("com.patrykandpatrick.vico:core:1.14.0")          // Core de Vico
+        implementation("com.patrykandpatrick.vico:compose-m3:1.14.0") // O compose si no usas Material 3
+
+
+
+
+        
+
+
+
+
 
     // (Opcional) ByteBeats (antiguo gráfico)
     implementation("io.github.bytebeats:compose-charts:0.2.1")
 
     // ✅ CSV Reader
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
+
 
     // ✅ Firebase
     implementation(platform(libs.firebase.bom))
@@ -108,5 +122,8 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.7.5")
     implementation("androidx.compose.foundation:foundation:1.7.0")
     implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("com.itextpdf:itextg:5.5.10")
 
-}
+    }
+
+

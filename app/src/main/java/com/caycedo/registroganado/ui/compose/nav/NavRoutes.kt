@@ -7,6 +7,8 @@ object NavRoutes {
     const val LOGIN = "login"
     const val REGISTER = "register"
 
+
+
     // Homes según rol
     const val ADMIN_HOME = "adminHome"
     const val VET_HOME = "vetHome"
@@ -21,6 +23,8 @@ object NavRoutes {
     // Animales
     const val LIST_ANIMALS = "listAnimals"
     const val ADD_ANIMAL = "addAnimal"
+    const val REPORTE_ANIMAL = "reporte_animal"
+
 
     // Insumos
     const val SUPPLIES = "supplies"
@@ -31,5 +35,10 @@ object NavRoutes {
     const val PRODUCTIONS = "productions"
     const val REPORTS = "reports"
     const val REPORTS_PRODUCTION = "reportsProduction"
-    const val REPORTS_EXPORT = "reportsExport"
+
+    // NUEVAS RUTAS
+    const val EXCEL_IMPORT = "excel_import"
+    const val REPORTS_EXPORT = "report_export"
+
+
 }

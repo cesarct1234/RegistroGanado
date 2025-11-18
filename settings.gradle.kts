@@ -1,15 +1,7 @@
 pluginManagement {
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        google()
         mavenCentral()
-        // 🟢 Agregado para asegurar compatibilidad con dependencias externas
-        maven { url = uri("https://jitpack.io") }
         gradlePluginPortal()
     }
 }
@@ -18,8 +10,8 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
-        mavenCentral()  // 👈 Mantén esta línea
-        // 🟢 Repositorio adicional para dependencias como charts, Firebase, etc.
+        mavenCentral()   // ✔ necesario para co.yml:charts
+        // JitPack solo si usas librerías de GitHub
         maven { url = uri("https://jitpack.io") }
     }
 }

@@ -15,6 +15,8 @@ credentials = "1.5.0"
 credentialsPlayServicesAuth = "1.5.0"
 googleid = "1.1.1"
 uiText = "1.9.4"
+animation = "1.9.4"
+pdfViewer = "1.0.0-alpha11"
 
 [libraries]
 # ✅ Jetpack Compose (usando BOM para versiones coordinadas)
@@ -38,6 +40,8 @@ credentials = { group = "androidx.credentials", name = "credentials", version.re
 credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
+animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
+pdf-viewer = { group = "androidx.pdf", name = "pdf-viewer", version.ref = "pdfViewer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

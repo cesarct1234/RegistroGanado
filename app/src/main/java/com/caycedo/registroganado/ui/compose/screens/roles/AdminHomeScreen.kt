@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+//import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,11 +22,19 @@ import com.caycedo.registroganado.R
 import com.caycedo.registroganado.ui.compose.nav.NavRoutes
 import com.google.firebase.auth.FirebaseAuth
 
+
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminHomeScreen(navController: NavController) {
 
+
     val auth = FirebaseAuth.getInstance()
+
+
 
     Scaffold(
         topBar = {
@@ -48,14 +57,13 @@ fun AdminHomeScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFB7E4A5)) // ✅ Fondo verde bonito
+                .background(Color(0xFFB7E4A5))
                 .padding(padding)
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // ✅ Imagen agregada arriba del panel
             Image(
                 painter = painterResource(id = R.drawable.imglogin),
                 contentDescription = "Imagen decorativa",
@@ -63,6 +71,10 @@ fun AdminHomeScreen(navController: NavController) {
                     .size(180.dp)
                     .padding(top = 10.dp)
             )
+
+            // ======================
+            //  MÓDULOS PRINCIPALES
+            // ======================
 
             AdminItem(
                 title = "Gestión de Usuarios",
@@ -94,6 +106,26 @@ fun AdminHomeScreen(navController: NavController) {
                 icon = Icons.Default.BarChart
             ) {
                 navController.navigate(NavRoutes.REPORTS)
+            }
+
+            // ======================
+            //  NUEVAS FUNCIONES
+            // ======================
+
+            AdminItem(
+                title = "Importar desde Excel",
+                description = "Cargar animales por lotes",
+                icon = Icons.Default.Upload
+            ) {
+                navController.navigate(NavRoutes.EXCEL_IMPORT)
+            }
+
+            AdminItem(
+                title = "Exportar PDF",
+                description = "Generar reporte completo",
+                icon = Icons.Default.PictureAsPdf
+            ) {
+                navController.navigate(NavRoutes.REPORTS_EXPORT)
             }
         }
     }
@@ -143,6 +175,12 @@ fun AdminItem(
                 )
             }
         }
+
+
+
+
+
+
     }
 }
 
