@@ -1,20 +1,19 @@
 package com.caycedo.registroganado.ui_compose.screens.roles
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-//import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+//import androidx.compose.ui.platform.LocalIndication
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -22,19 +21,11 @@ import com.caycedo.registroganado.R
 import com.caycedo.registroganado.ui.compose.nav.NavRoutes
 import com.google.firebase.auth.FirebaseAuth
 
-
-
-
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminHomeScreen(navController: NavController) {
 
-
     val auth = FirebaseAuth.getInstance()
-
-
 
     Scaffold(
         topBar = {
@@ -72,10 +63,6 @@ fun AdminHomeScreen(navController: NavController) {
                     .padding(top = 10.dp)
             )
 
-            // ======================
-            //  MÓDULOS PRINCIPALES
-            // ======================
-
             AdminItem(
                 title = "Gestión de Usuarios",
                 description = "Crear, editar y administrar roles",
@@ -108,10 +95,6 @@ fun AdminHomeScreen(navController: NavController) {
                 navController.navigate(NavRoutes.REPORTS)
             }
 
-            // ======================
-            //  NUEVAS FUNCIONES
-            // ======================
-
             AdminItem(
                 title = "Importar desde Excel",
                 description = "Cargar animales por lotes",
@@ -143,8 +126,8 @@ fun AdminItem(
             .fillMaxWidth()
             .height(110.dp)
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
+                indication = LocalIndication.current,
+                interactionSource = null
             ) { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
@@ -175,12 +158,7 @@ fun AdminItem(
                 )
             }
         }
-
-
-
-
-
-
     }
 }
+
 

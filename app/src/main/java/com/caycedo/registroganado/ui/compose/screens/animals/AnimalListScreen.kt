@@ -1,9 +1,8 @@
 package com.caycedo.registroganado.ui.compose.screens.animals
 
-import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+//import androidx.compose.ui.platform.LocalIndication
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -21,7 +21,6 @@ import com.caycedo.registroganado.ui.compose.nav.NavRoutes
 import com.caycedo.registroganado.ui.compose.screens.utils.ExcelUtility
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,12 +33,11 @@ fun AnimalListScreen(navController: NavController) {
     val dbUsers = FirebaseDatabase.getInstance().getReference("usuarios")
     val dbAnimals = FirebaseDatabase.getInstance().getReference("animales_global")
 
-
     var myRole by remember { mutableStateOf("") }
     var lista by remember { mutableStateOf(listOf<Animal>()) }
     var filtro by remember { mutableStateOf("Activos") }
 
-    // Obtener rol
+    // Obtener el rol
     LaunchedEffect(Unit) {
         dbUsers.child(myUid).get().addOnSuccessListener { snap ->
             myRole = snap.child("rol").value.toString()
@@ -57,7 +55,6 @@ fun AnimalListScreen(navController: NavController) {
             for (node in snap.children) {
                 val a = node.getValue(Animal::class.java) ?: continue
 
-                // 🚀 Mostrar TODOS los animales al administrador, sin filtro por propietario
                 when (myRole) {
 
                     "administrador" -> {
@@ -82,33 +79,32 @@ fun AnimalListScreen(navController: NavController) {
                         if (a.activo) tmp.add(a)
                     }
                 }
-
             }
 
             lista = tmp
         }
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Gestión de Animales", fontWeight = FontWeight.Bold) },
                 actions = {
+
                     if (myRole == "administrador" || myRole == "propietario") {
                         IconButton(onClick = {
                             navController.navigate(NavRoutes.ADD_ANIMAL)
                         }) {
-                            Icon(Icons.Default.Add, contentDescription = null)
+                            Icon(Icons.Default.Add, contentDescription = "Agregar")
                         }
                     }
+
                     IconButton(onClick = {
                         val excel = ExcelUtility.exportarAnimales(context, lista)
                         compartirArchivo(context, excel)
                     }) {
                         Icon(Icons.Default.Download, contentDescription = "Exportar Excel")
                     }
-
                 }
             )
         }
@@ -132,12 +128,12 @@ fun AnimalListScreen(navController: NavController) {
 
             if (lista.isEmpty()) {
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text("No hay animales")
+                    Text("No hay animales registrados")
                 }
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    items(lista) {
-                        AnimalCard(it, myRole, navController)
+                    items(lista) { a ->
+                        AnimalCard(a, myRole, navController)
                     }
                 }
             }
@@ -145,7 +141,9 @@ fun AnimalListScreen(navController: NavController) {
     }
 }
 
-private fun RowScope.compartirArchivo(context: android.content.Context, excel: java.io.File) {}
+private fun compartirArchivo(context: android.content.Context, excel: java.io.File) {
+    Toast.makeText(context, "Archivo generado en: ${excel.path}", Toast.LENGTH_LONG).show()
+}
 
 @Composable
 fun AnimalCard(
@@ -181,7 +179,7 @@ fun AnimalCard(
 
                 Row {
 
-                    // Editar
+                    // 👉 EDITAR
                     if ((role == "administrador" || role == "propietario") && animal.activo) {
                         Icon(
                             Icons.Default.Edit,
@@ -189,15 +187,16 @@ fun AnimalCard(
                             modifier = Modifier
                                 .size(32.dp)
                                 .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
+                                    indication = LocalIndication.current,
+                                    interactionSource = null
                                 ) {
-                                    navController.navigate("${NavRoutes.ADD_ANIMAL}/${animal.propietarioId}/${animal.id}")
+                                    navController.navigate("addAnimal/${animal.propietarioId}/${animal.id}")
+
                                 }
                         )
                     }
 
-                    // Activar / desactivar
+                    // 👉 ACTIVAR / DESACTIVAR
                     if (role == "administrador" || role == "propietario") {
                         Icon(
                             if (animal.activo) Icons.Default.Block else Icons.Default.Check,
@@ -205,8 +204,8 @@ fun AnimalCard(
                             modifier = Modifier
                                 .size(32.dp)
                                 .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
+                                    indication = LocalIndication.current,
+                                    interactionSource = null
                                 ) {
                                     val nuevo = !animal.activo
                                     db.child(animal.id).child("activo").setValue(nuevo)

@@ -1,9 +1,9 @@
 package com.caycedo.registroganado.ui.compose.screens.animals
 
 import android.app.DatePickerDialog
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+//import androidx.compose.ui.platform.LocalIndication
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -35,8 +36,7 @@ fun AddAnimalScreen(
     val auth = FirebaseAuth.getInstance()
     val userId = auth.currentUser?.uid ?: return
 
-    // 🔥 MUY IMPORTANTE — CADA USUARIO CON SU CARPETA
-    val db = FirebaseDatabase.getInstance().getReference("animales").child(userId)
+    val db = FirebaseDatabase.getInstance().getReference("animales_global").child(userId)
 
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -64,10 +64,9 @@ fun AddAnimalScreen(
     val razas = listOf("Holstein", "Brahman", "Jersey", "Angus", "Normando", "Gyr")
     val sexos = listOf("Macho", "Hembra")
     val tiposProd = listOf("Leche", "Carne", "Mixta")
-    val vacunasCatalogo = listOf("Carbunco", "Aftosa", "Brucelosis", "Rabia", "Leptospirosis")
 
     // ----------------------------------------------------
-    // 🔥 Cargar datos si EDITA animal
+    // CARGAR DATOS SI ESTÁ EDITANDO
     // ----------------------------------------------------
     LaunchedEffect(animalIdParam) {
         if (isEditing) {
@@ -95,7 +94,7 @@ fun AddAnimalScreen(
     }
 
     // ----------------------------------------------------
-    // 🔥 Calcular edad automática
+    // CALCULAR EDAD AUTOMÁTICA
     // ----------------------------------------------------
     LaunchedEffect(nacimiento) {
         if (nacimiento.matches(Regex("\\d{2}/\\d{2}/\\d{4}"))) {
@@ -134,7 +133,7 @@ fun AddAnimalScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            // ID
+            // ID + Sugerir
             Row {
                 OutlinedTextField(
                     value = id,
@@ -148,7 +147,7 @@ fun AddAnimalScreen(
                 }
             }
 
-            // NOMBRE
+            // nombre
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
@@ -156,19 +155,15 @@ fun AddAnimalScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // RAZA
+            // Dropdowns
             DropdownField("Raza", raza, razas) { raza = it }
-
-            // SEXO
             DropdownField("Sexo", sexo, sexos) { sexo = it }
-
-            // TIPO PRODUCCIÓN
             DropdownField("Tipo producción", tipoProduccion, tiposProd) { tipoProduccion = it }
 
             // FECHA NACIMIENTO
             DateField("Nacimiento", nacimiento) { nacimiento = it }
 
-            // PESO
+            // Peso
             OutlinedTextField(
                 value = peso,
                 onValueChange = { peso = it.filter { c -> c.isDigit() || c == '.' } },
@@ -177,7 +172,7 @@ fun AddAnimalScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // PRODUCCIÓN LECHE
+            // Producción leche
             if (tipoProduccion == "Leche" || tipoProduccion == "Mixta") {
                 OutlinedTextField(
                     value = produccionLeche,
@@ -197,7 +192,6 @@ fun AddAnimalScreen(
                     }
 
                     isSaving = true
-
                     val newId = if (isEditing) animalIdParam!! else db.push().key!!
 
                     val animal = Animal(
@@ -236,6 +230,10 @@ fun AddAnimalScreen(
     }
 }
 
+
+// ======================================================
+// FECHA
+// ======================================================
 @Composable
 fun DateField(
     label: String,
@@ -257,21 +255,27 @@ fun DateField(
         year, month, day
     )
 
-    OutlinedTextField(
-        value = value,
-        onValueChange = {},
-        label = { Text(label) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                datePicker.show()
-            },
-        enabled = false,
-        readOnly = true
-    )
+    Column {
+        Text(label, fontWeight = FontWeight.Bold)
+        OutlinedTextField(
+            value = value,
+            onValueChange = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(
+                    indication = LocalIndication.current,
+                    interactionSource = null
+                ) { datePicker.show() },
+            enabled = false,
+            readOnly = true
+        )
+    }
 }
 
 
+// ======================================================
+// DROPDOWN
+// ======================================================
 @Composable
 fun DropdownField(
     label: String,
@@ -282,13 +286,16 @@ fun DropdownField(
     var expanded by remember { mutableStateOf(false) }
 
     Column {
+        Text(label, fontWeight = FontWeight.Bold)
         OutlinedTextField(
             value = selected,
             onValueChange = {},
-            label = { Text(label) },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = true },
+                .clickable(
+                    indication = LocalIndication.current,
+                    interactionSource = null
+                ) { expanded = true },
             enabled = false,
             readOnly = true
         )

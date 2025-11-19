@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1017080400536",
+    "project_id": "registro-e698f",
+    "storage_bucket": "registro-e698f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1017080400536:android:24fa701d13580b25c15eed",
+        "android_client_info": {
+          "package_name": "com.caycedo.registroganado"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTnNOcRezajpj3LqBmmO4Zb04eVYzgMEQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

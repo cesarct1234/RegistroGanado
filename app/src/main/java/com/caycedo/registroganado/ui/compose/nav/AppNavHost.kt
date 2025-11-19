@@ -67,9 +67,22 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             ReporteAnimalScreen(navController, animalId)
         }
 
-        composable("${NavRoutes.ADD_ANIMAL}/{animalId}") { backStack ->
+        // Crear
+        composable(NavRoutes.ADD_ANIMAL) {
+            AddAnimalScreen(navController)
+        }
+
+// Editar
+        composable(NavRoutes.EDIT_ANIMAL) { backStack ->
+
+            val propietarioId = backStack.arguments?.getString("propietarioId")
             val animalId = backStack.arguments?.getString("animalId")
-            AddAnimalScreen(navController, animalIdParam = animalId)
+
+            AddAnimalScreen(
+                navController = navController,
+                propietarioIdParam = propietarioId,
+                animalIdParam = animalId
+            )
         }
 
 

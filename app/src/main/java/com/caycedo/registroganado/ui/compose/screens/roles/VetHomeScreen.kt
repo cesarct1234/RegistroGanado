@@ -1,5 +1,6 @@
 package com.caycedo.registroganado.ui_compose.screens.roles
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -10,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.caycedo.registroganado.ui.compose.nav.NavRoutes
@@ -38,59 +39,54 @@ fun VetHomeScreen(navController: NavController) {
                 }
             )
         }
-    ) { padding ->
+    ) { pad ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .background(Color(0xFFE3F2FD))
+                .padding(pad)
                 .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // =============================================
-            // 🔹 Historial médico
-            // =============================================
-            VetCard(
-                title = "Historial Médico",
-                description = "Vacunas, tratamientos y registros clínicos",
-                icon = Icons.Default.MedicalServices
-            ) {
-                // navController.navigate("historialMedico")
-            }
-
-            // =============================================
-            // 🔹 Consulta general de animales
-            // =============================================
-            VetCard(
-                title = "Animales",
-                description = "Consultar y evaluar animales registrados",
+            VetItem(
+                title = "Animales Asignados",
+                description = "Ver animales activos",
                 icon = Icons.Default.Pets
             ) {
                 navController.navigate(NavRoutes.LIST_ANIMALS)
             }
 
-            // =============================================
-            // 🔹 Certificados veterinarios
-            // =============================================
-            VetCard(
-                title = "Certificados",
-                description = "Emitir certificados de salud y producción",
-                icon = Icons.Default.Receipt
+            VetItem(
+                title = "Historial Clínico",
+                description = "Vacunas, tratamientos, cirugías",
+                icon = Icons.Default.Healing
             ) {
-                // navController.navigate("certificadosVet")
+                // Reutilizas pantalla general (después creamos detalle)
+                navController.navigate(NavRoutes.LIST_ANIMALS)
+            }
+
+            VetItem(
+                title = "Registrar Peso",
+                description = "Control de crecimiento",
+                icon = Icons.Default.MonitorWeight
+            ) {
+                navController.navigate(NavRoutes.LIST_ANIMALS)
             }
         }
     }
 }
 
 @Composable
-fun VetCard(
+fun VetItem(
     title: String,
     description: String,
-    icon: ImageVector,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit
 ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,11 +95,10 @@ fun VetCard(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ) { onClick() },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
+
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -121,11 +116,7 @@ fun VetCard(
 
             Column {
                 Text(title, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Text(description, style = MaterialTheme.typography.bodyMedium)
             }
         }
     }

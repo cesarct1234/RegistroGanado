@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.ui.text)
     implementation(libs.animation)
     //implementation(libs.pdf.viewer)
+    
 
 
     // ✅ Desugarización (soporte de Java 8+)
