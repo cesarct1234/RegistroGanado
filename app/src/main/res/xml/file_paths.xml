@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <external-files-path
-        name="external_downloads"
-        path="Download/" />
-    <external-files-path
-        name="external_reports_subdir"
-        path="Download/reports/" />
-    <external-files-path
-        name="external_files"
+
+    <!-- Carpeta interna privada (PDF/Excel recomendada) -->
+    <files-path
+        name="app_files"
         path="." />
+
+    <!-- Cache interna (para PDFs temporales o imágenes) -->
+    <cache-path
+        name="app_cache"
+        path="." />
+
+    <!-- Carpeta externa privada (Android/data/...) -->
+    <external-files-path
+        name="app_external_files"
+        path="." />
+
+    <!-- Carpeta externa para documentos dentro del sandbox -->
+    <external-files-path
+        name="app_reports"
+        path="Documents/" />
+
 </paths>

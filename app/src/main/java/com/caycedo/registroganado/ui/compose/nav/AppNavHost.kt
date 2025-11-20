@@ -6,19 +6,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
-import com.caycedo.registroganado.ui.compose.screens.ProductionScreen
-import com.caycedo.registroganado.ui.compose.screens.animals.AddAnimalScreen
-import com.caycedo.registroganado.ui.compose.screens.animals.AnimalListScreen
-import com.caycedo.registroganado.ui.compose.screens.reports.GenerateReportScreen
-import com.caycedo.registroganado.ui.compose.screens.reports.ReportsProductionScreen
-import com.caycedo.registroganado.ui.compose.screens.reports.ReportsScreen
-import com.caycedo.registroganado.ui.compose.screens.supplies.AddSupplyScreen
-import com.caycedo.registroganado.ui.compose.screens.supplies.EditSupplyScreen
-import com.caycedo.registroganado.ui.compose.screens.supplies.SuppliesScreen
-
 import com.caycedo.registroganado.ui_compose.screens.*
 import com.caycedo.registroganado.ui.compose.screens.users.*
+import com.caycedo.registroganado.ui.compose.screens.animals.*
+import com.caycedo.registroganado.ui.compose.screens.supplies.*
+import com.caycedo.registroganado.ui.compose.screens.reports.*
 import com.caycedo.registroganado.ui_compose.screens.roles.*
+import com.caycedo.registroganado.ui.compose.screens.ProductionScreen
+import com.caycedo.registroganado.ui.compose.screens.RegisterScreen
+import com.caycedo.registroganado.ui_compose.screens.users.CreateUserScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
@@ -28,98 +24,67 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         startDestination = NavRoutes.WELCOME
     ) {
 
-        //------------------------------------
-        // AUTH
-        //------------------------------------
-
-
+        // 🔵 AUTENTICACIÓN
         composable(NavRoutes.WELCOME) { WelcomeScreen(navController) }
         composable(NavRoutes.LOGIN) { LoginScreen(navController) }
         composable(NavRoutes.REGISTER) { RegisterScreen(navController) }
 
-        //------------------------------------
-        // HOMES POR ROL
-        //------------------------------------
+        // 🔵 HOMES POR ROL
         composable(NavRoutes.ADMIN_HOME) { AdminHomeScreen(navController) }
         composable(NavRoutes.VET_HOME) { VetHomeScreen(navController) }
-        composable(NavRoutes.CUIDADOR_HOME) { CuidadorHomeScreen(navController) }
-        composable(NavRoutes.PROP_HOME) { PropHomeScreen(navController) }
 
-        //------------------------------------
-        // GESTIÓN DE USUARIOS
-        //------------------------------------
+        composable("${NavRoutes.PROP_HOME}/{propietarioId}") { back ->
+            val propietarioId = back.arguments?.getString("propietarioId") ?: ""
+            PropHomeScreen(navController, propietarioId)
+        }
+
+        composable("${NavRoutes.CUIDADOR_HOME}/{cuidadorId}") { back ->
+            val cuidadorId = back.arguments?.getString("cuidadorId") ?: ""
+            CuidadorHomeScreen(navController, cuidadorId)
+        }
+
+        // 🔵 GESTIÓN DE USUARIOS
         composable(NavRoutes.USERS_MANAGEMENT) { UserManagementScreen(navController) }
         composable(NavRoutes.CREATE_USER) { CreateUserScreen(navController) }
-        composable("${NavRoutes.EDIT_USER}/{userId}") { backStackEntry ->
-            val userId = backStackEntry.arguments?.getString("userId") ?: ""
-            EditUserScreen(navController, userId)
+        composable("${NavRoutes.EDIT_USER}/{userId}") { back ->
+            EditUserScreen(navController, back.arguments?.getString("userId") ?: "")
         }
 
-        //------------------------------------
-        // ANIMALES
-        //------------------------------------
-        composable(NavRoutes.LIST_ANIMALS) { AnimalListScreen(navController) }
-
-        composable(NavRoutes.ADD_ANIMAL) { AddAnimalScreen(navController) }
-
-        composable("${NavRoutes.REPORTE_ANIMAL}/{animalId}") { backStackEntry ->
-            val animalId = backStackEntry.arguments?.getString("animalId") ?: ""
-            ReporteAnimalScreen(navController, animalId)
+        // 🔵 ANIMALES
+        composable(NavRoutes.LIST_ANIMALS) {
+            AnimalListScreen(navController)
         }
 
-        // Crear
-        composable(NavRoutes.ADD_ANIMAL) {
-            AddAnimalScreen(navController)
-        }
-
-// Editar
-        composable(NavRoutes.EDIT_ANIMAL) { backStack ->
-
-            val propietarioId = backStack.arguments?.getString("propietarioId")
-            val animalId = backStack.arguments?.getString("animalId")
-
+        composable("${NavRoutes.ADD_ANIMAL}/{propietarioId}") { back ->
             AddAnimalScreen(
-                navController = navController,
-                propietarioIdParam = propietarioId,
-                animalIdParam = animalId
+                navController,
+                animalIdParam = null,
+                propietarioIdParam = back.arguments?.getString("propietarioId")
             )
         }
 
-
-
-        //------------------------------------
-        // INSUMOS
-        //------------------------------------
-        composable(NavRoutes.SUPPLIES) { SuppliesScreen(navController) }
-        composable(NavRoutes.ADD_SUPPLY) { AddSupplyScreen(navController) }
-        composable("${NavRoutes.EDIT_SUPPLY}/{insumoId}") { backStackEntry ->
-            val insumoId = backStackEntry.arguments?.getString("insumoId") ?: ""
-            EditSupplyScreen(navController, insumoId)
+        composable("${NavRoutes.EDIT_ANIMAL}/{propietarioId}/{animalId}") { back ->
+            AddAnimalScreen(
+                navController,
+                animalIdParam = back.arguments?.getString("animalId"),
+                propietarioIdParam = back.arguments?.getString("propietarioId")
+            )
         }
 
-        //------------------------------------
-        // REPORTES / PRODUCCIÓN
-        //------------------------------------
+        // 🔵 INSUMOS
+        composable(NavRoutes.SUPPLIES) { SuppliesScreen(navController) }
+        composable(NavRoutes.ADD_SUPPLY) { AddSupplyScreen(navController) }
+        composable("${NavRoutes.EDIT_SUPPLY}/{insumoId}") { back ->
+            EditSupplyScreen(navController, back.arguments?.getString("insumoId") ?: "")
+        }
+
+        // 🔵 REPORTES / PRODUCCIÓN
         composable(NavRoutes.PRODUCTIONS) { ProductionScreen(navController) }
         composable(NavRoutes.REPORTS) { ReportsScreen(navController) }
         composable(NavRoutes.REPORTS_PRODUCTION) { ReportsProductionScreen(navController) }
         composable(NavRoutes.REPORTS_EXPORT) { GenerateReportScreen(navController) }
-        composable(NavRoutes.EXCEL_IMPORT) { GenerateReportScreen(navController) }
 
-
+        // 🔵 IMPORTAR EXCEL (CORRECTO)
+        composable(NavRoutes.EXCEL_IMPORT) { ExcelImportScreen(navController) }
     }
 }
-
-@Composable
-fun DashboardScreen() {
-    TODO("Not yet implemented")
-}
-
-@Composable
-fun ReporteAnimalScreen(x0: NavHostController, x1: String) {
-    TODO("Not yet implemented")
-}
-
-
-
-

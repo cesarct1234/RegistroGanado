@@ -1,5 +1,3 @@
-// build.gradle.kts (Nivel de módulo: app)
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -14,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.caycedo.registroganado"
-        minSdk = 26 // Compatibilidad ampliada
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -31,11 +29,10 @@ android {
         }
     }
 
-    // ✅ Opciones modernas de compilación
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true // Requerido para Apache POI
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -59,72 +56,54 @@ android {
 }
 
 dependencies {
-    // ✅ Librerías base
-    implementation(libs.foundation)
-    implementation(libs.credentials)
-    implementation(libs.credentials.play.services.auth)
-    implementation(libs.googleid)
-    implementation(libs.ui.text)
-    implementation(libs.animation)
-    //implementation(libs.pdf.viewer)
-    
 
-
-    // ✅ Desugarización (soporte de Java 8+)
+    // --- DESUGAR (Java 8+ para POI Excel) ---
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
-    // ✅ Apache POI (Excel)
-    implementation("org.apache.poi:poi-ooxml:5.2.5")
-
-    // ✅ Vico Charts (gráficos profesionales)
-
-        implementation("com.patrykandpatrick.vico:core:1.14.0")          // Core de Vico
-        implementation("com.patrykandpatrick.vico:compose-m3:1.14.0") // O compose si no usas Material 3
-
-
-
-
-        
-
-
-
-
-
-    // (Opcional) ByteBeats (antiguo gráfico)
-    implementation("io.github.bytebeats:compose-charts:0.2.1")
-
-    // ✅ CSV Reader
-    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
-
-
-    // ✅ Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-database")
-
-    // ✅ Corrutinas / Lifecycle
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-
-    // ✅ Imágenes (Coil)
-    implementation("io.coil-kt:coil-compose:2.6.0")
-
-    // ✅ Material 3 y Compose
+    // --- Compose / Material 3 (USO EXCLUSIVO DEL BOM — NO DUPLICAR) ---
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
     implementation(libs.compose.ui.preview)
-    debugImplementation(libs.compose.ui.tooling)
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)
+    debugImplementation(libs.compose.ui.tooling)
+
+    // --- Foundation moderno (del catalogo) ---
+    implementation(libs.foundation)
+
+    // --- Íconos extendidos (opcional / estable) ---
     implementation("androidx.compose.material:material-icons-extended")
-    // ✅ LiveData + Compose Integration (necesario para observeAsState)
-    implementation("androidx.compose.runtime:runtime-livedata:1.7.5")
-    implementation("androidx.compose.foundation:foundation:1.7.0")
-    implementation("androidx.compose.material3:material3:1.2.1")
+
+    // --- Firebase ---
+    implementation(platform(libs.firebase.bom))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
+
+    // --- Coil imágenes ---
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // --- Vico charts (gráficos premium) ---
+    implementation("com.patrykandpatrick.vico:core:1.14.0")
+    implementation("com.patrykandpatrick.vico:compose-m3:1.14.0")
+
+    // --- CSV ---
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")
+
+    // --- Excel (Apache POI) ---
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
+
+    // --- PDF ---
     implementation("com.itextpdf:itextg:5.5.10")
 
-    }
+    // --- Corrutinas & Lifecycle ---
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+
+    // --- LiveData + Compose ---
+    implementation("androidx.compose.runtime:runtime-livedata")
+}
+
 
 

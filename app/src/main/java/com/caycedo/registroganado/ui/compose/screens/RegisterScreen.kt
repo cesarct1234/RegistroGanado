@@ -1,9 +1,11 @@
-package com.caycedo.registroganado.ui_compose.screens
+package com.caycedo.registroganado.ui.compose.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,34 +35,29 @@ fun RegisterScreen(navController: NavController) {
     var message by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
-    // -----------------------------------------------
-    // 🔥 DETECTAR SI ES EL PRIMER USUARIO
-    // -----------------------------------------------
+    // -------------------------------------------------------
+    // 🔥 Detectar si es el primer usuario registrado
+    // -------------------------------------------------------
     var isFirstUser by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        FirebaseDatabase.getInstance()
-            .getReference("usuarios")
-            .get()
-            .addOnSuccessListener { snap ->
-                if (!snap.hasChildren()) {
-                    isFirstUser = true
-                    rol = "administrador" // asignación automática
-                }
+        dbRef.get().addOnSuccessListener { snap ->
+            if (!snap.hasChildren()) {
+                isFirstUser = true
+                rol = "administrador"
             }
+        }
     }
 
-    // -----------------------------------------------
-    // 🔥 DETECTAR EL ROL DEL USUARIO QUE ESTÁ LOGUEADO
-    // -----------------------------------------------
+    // -------------------------------------------------------
+    // 🔥 Rol del usuario que está logueado
+    // -------------------------------------------------------
     val currentUserId = auth.currentUser?.uid
     var currentUserRole by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         if (!isFirstUser && currentUserId != null) {
-            FirebaseDatabase.getInstance()
-                .getReference("usuarios")
-                .child(currentUserId)
+            dbRef.child(currentUserId)
                 .child("rol")
                 .get()
                 .addOnSuccessListener {
@@ -69,10 +66,15 @@ fun RegisterScreen(navController: NavController) {
         }
     }
 
+    // UI ----------------------------------------------------
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Registro de Usuario", fontWeight = FontWeight.Bold) }
+                title = {
+                    Text("Registro de Usuario",
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             )
         }
     ) { pad ->
@@ -86,33 +88,33 @@ fun RegisterScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // 🔹 NOMBRE
+            // 🔹 Nombre
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
                 label = { Text("Nombre completo") },
-                leadingIcon = { Icon(Icons.Default.Person, null) },
+                leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 🔹 CORREO
+            // 🔹 Correo
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Correo electrónico") },
-                leadingIcon = { Icon(Icons.Default.MailOutline, null) },
+                leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = null) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 12.dp)
             )
 
-            // 🔹 CONTRASEÑA
+            // 🔹 Contraseña
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = { password = it },   // ← CORREGIDO
                 label = { Text("Contraseña") },
-                leadingIcon = { Icon(Icons.Default.Lock, null) },
+                leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier
@@ -122,12 +124,11 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(Modifier.height(20.dp))
 
-            // ---------------------------------------------------------------------
-            // 🔥 SELECTOR DEL ROL
-            // ---------------------------------------------------------------------
-
+            // --------------------------------------------------------
+            // 🔥 Selector de rol
+            // --------------------------------------------------------
             when {
-                // 1️⃣ PRIMER USUARIO → ADMIN AUTOMÁTICO
+                // 1️⃣ Primer usuario → admin automático
                 isFirstUser -> {
                     OutlinedTextField(
                         value = "administrador",
@@ -139,11 +140,15 @@ fun RegisterScreen(navController: NavController) {
                     rol = "administrador"
                 }
 
-                // 2️⃣ UN ADMIN ESTÁ REGISTRANDO → puede elegir el rol
+                // 2️⃣ Admin creando usuarios → puede elegir rol
                 currentUserRole == "administrador" -> {
-                    Text("Seleccione Rol", fontWeight = FontWeight.Bold)
 
-                    val roles = listOf("administrador", "propietario", "veterinario", "cuidador")
+                    val roles = listOf(
+                        "administrador",
+                        "propietario",
+                        "veterinario",
+                        "cuidador"
+                    )
 
                     ExposedDropdownMenuBox(
                         expanded = expanded,
@@ -154,10 +159,10 @@ fun RegisterScreen(navController: NavController) {
                             onValueChange = {},
                             readOnly = true,
                             label = { Text("Rol del usuario") },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-                            },
-                            modifier = Modifier.fillMaxWidth().menuAnchor()
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
                         )
 
                         ExposedDropdownMenu(
@@ -177,7 +182,7 @@ fun RegisterScreen(navController: NavController) {
                     }
                 }
 
-                // 3️⃣ Cualquier otro usuario → siempre propietario
+                // 3️⃣ Usuarios normales → dueño siempre
                 else -> {
                     OutlinedTextField(
                         value = "propietario",
@@ -192,9 +197,9 @@ fun RegisterScreen(navController: NavController) {
 
             Spacer(Modifier.height(24.dp))
 
-            // ------------------------------------------------
-            // 🔘 BOTÓN REGISTRAR
-            // ------------------------------------------------
+            // --------------------------------------------------------
+            // 🔘 Botón Registrar
+            // --------------------------------------------------------
             Button(
                 onClick = {
                     if (nombre.isBlank() || email.isBlank() || password.isBlank()) {

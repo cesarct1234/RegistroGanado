@@ -44,7 +44,7 @@ object ExcelUtility {
             row.createCell(8).setCellValue(a.ultimoParto)
             row.createCell(9).setCellValue(a.produccionLeche)
             row.createCell(10).setCellValue(a.tipoProduccion)
-            row.createCell(11).setCellValue(a.vacunas)
+            row.createCell(11).setCellValue(a.vacunaciones)
             row.createCell(12).setCellValue(a.tratamientos)
             row.createCell(13).setCellValue(a.observaciones)
             row.createCell(14).setCellValue(a.aptoConsumo.toString())

@@ -21,9 +21,7 @@ object NavRoutes {
     // Animales
     const val LIST_ANIMALS = "listAnimals"
     const val ADD_ANIMAL = "addAnimal"
-
-    // 🔥 Ruta correcta para editar
-    const val EDIT_ANIMAL = "addAnimal/{propietarioId}/{animalId}"
+    const val EDIT_ANIMAL = "editAnimal"     // ✅ CORRECCIÓN
 
     const val REPORTE_ANIMAL = "reporte_animal"
 

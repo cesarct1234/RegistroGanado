@@ -1,9 +1,12 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.caycedo.registroganado.ui_compose.screens.roles
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -17,9 +20,11 @@ import androidx.navigation.NavController
 import com.caycedo.registroganado.ui.compose.nav.NavRoutes
 import com.google.firebase.auth.FirebaseAuth
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PropHomeScreen(navController: NavController) {
+fun PropHomeScreen(
+    navController: NavController,
+    propietarioId: String
+) {
 
     val auth = FirebaseAuth.getInstance()
 
@@ -39,79 +44,100 @@ fun PropHomeScreen(navController: NavController) {
                 }
             )
         }
-    ) { pad ->
+    ) { padding ->
 
         Column(
             modifier = Modifier
+                .padding(padding)
                 .fillMaxSize()
-                .background(Color(0xFFFFF3CD))
-                .padding(pad)
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(Color(0xFFE7F6E7))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 
-            PropItem(
-                title = "Mis animales",
-                description = "Solo animales propios",
+            HomeButton(
+                title = "Registrar Animal",
+                description = "Añade un nuevo animal a tu finca",
+                icon = Icons.Default.AddCircle
+            ) {
+                navController.navigate("${NavRoutes.ADD_ANIMAL}/$propietarioId")
+            }
+
+            HomeButton(
+                title = "Ver Mis Animales",
+                description = "Consulta todos los animales registrados",
                 icon = Icons.Default.Pets
             ) {
                 navController.navigate(NavRoutes.LIST_ANIMALS)
             }
 
-            PropItem(
-                title = "Reportes de Producción",
-                description = "Leche, peso, rendimiento",
-                icon = Icons.Default.BarChart
-            ) {
-                navController.navigate(NavRoutes.REPORTS)
-            }
-
-            PropItem(
-                title = "Insumos y gastos",
-                description = "Control de costos",
+            HomeButton(
+                title = "Insumos",
+                description = "Gestiona el inventario de insumos",
                 icon = Icons.Default.Inventory
             ) {
                 navController.navigate(NavRoutes.SUPPLIES)
+            }
+
+            HomeButton(
+                title = "Reportes",
+                description = "Producción, estadísticas y PDF",
+                icon = Icons.Default.BarChart
+            ) {
+                navController.navigate(NavRoutes.REPORTS)
             }
         }
     }
 }
 
 @Composable
-fun PropItem(
+fun HomeButton(
     title: String,
     description: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit
 ) {
 
+    // ⛔ SOLUCIÓN: usar interacción nueva + ripple moderno
+    val interaction = remember { MutableInteractionSource() }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(110.dp)
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
+                interactionSource = interaction,
+                indication = LocalIndication.current
             ) { onClick() },
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
     ) {
 
         Row(
-            Modifier.fillMaxSize().padding(20.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
+            horizontalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 
-            Icon(icon, contentDescription = null, modifier = Modifier.size(40.dp))
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(40.dp)
+            )
 
             Column {
                 Text(title, style = MaterialTheme.typography.titleMedium)
-                Text(description, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
 }
-
-

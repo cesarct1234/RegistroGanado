@@ -1,5 +1,6 @@
 package com.caycedo.registroganado.ui_compose.screens.roles
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -93,7 +94,7 @@ fun VetItem(
             .height(110.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null
+                indication = LocalIndication.current   // ✅ FIX FINAL
             ) { onClick() },
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -121,5 +122,6 @@ fun VetItem(
         }
     }
 }
+
 
 

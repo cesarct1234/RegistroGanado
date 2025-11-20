@@ -1,8 +1,7 @@
-package com.caycedo.registroganado.utils
+package com.caycedo.registroganado.ui.compose.screens.utils
 
 import android.content.Context
 import android.os.Environment
-//import com.caycedo.registroganado.ui.compose.screens.Animal
 import com.caycedo.registroganado.ui.compose.screens.animals.Animal
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPCell
@@ -15,6 +14,7 @@ object PdfGenerator {
 
     fun generarPDF(context: Context, animal: Animal): File {
 
+        // 📁 Carpeta privada segura
         val docsFolder = File(
             context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
             "ReportesGanado"
@@ -29,19 +29,21 @@ object PdfGenerator {
 
         document.open()
 
-        // Título
+        // 📝 Estilos
         val titleFont = Font(Font.FontFamily.HELVETICA, 22f, Font.BOLD)
         val normalFont = Font(Font.FontFamily.HELVETICA, 14f, Font.NORMAL)
+        val boldFont = Font(Font.FontFamily.HELVETICA, 14f, Font.BOLD)
 
-        document.add(Paragraph("Reporte Individual de Animal", titleFont))
-        document.add(Paragraph("ID Interno: ${animal.id}\n\n", normalFont))
+        // 🟢 Título
+        document.add(Paragraph("Reporte Individual del Animal", titleFont))
+        document.add(Paragraph("\nID Interno: ${animal.id}\n\n", normalFont))
 
-        // Tabla
+        // 🟦 TABLA
         val table = PdfPTable(2)
         table.widthPercentage = 100f
 
         fun addRow(label: String, value: String) {
-            val cell1 = PdfPCell(Phrase(label, normalFont))
+            val cell1 = PdfPCell(Phrase(label, boldFont))
             cell1.backgroundColor = BaseColor(230, 230, 250)
             table.addCell(cell1)
 
@@ -52,22 +54,24 @@ object PdfGenerator {
         addRow("Nombre", animal.nombre)
         addRow("Raza", animal.raza)
         addRow("Sexo", animal.sexo)
+        addRow("Tipo Producción", animal.tipoProduccion)
         addRow("Fecha de nacimiento", animal.nacimiento)
         addRow("Edad", animal.edad)
         addRow("Peso", "${animal.peso} kg")
-        addRow("Estado Reproductivo", animal.estadoReproductivo)
+        addRow("Producción de leche", animal.produccionLeche)
+        addRow("Estado reproductivo", animal.estadoReproductivo)
         addRow("Último parto", animal.ultimoParto)
-        addRow("Producción Leche", animal.produccionLeche)
-        addRow("Tipo Producción", animal.tipoProduccion)
-        addRow("Vacunas", animal.vacunas)
+        addRow("Vacunas aplicadas", animal.vacunaciones)
         addRow("Tratamientos", animal.tratamientos)
         addRow("Observaciones", animal.observaciones)
+        addRow("Propietario ID", animal.propietarioId)
         addRow("Apto para consumo", if (animal.aptoConsumo) "Sí" else "No")
-        addRow("Estado", if (animal.activo) "Activo" else "Inactivo")
+        addRow("Estado actual", if (animal.activo) "Activo" else "Inactivo")
 
         document.add(table)
 
         document.close()
+        output.close()
 
         return file
     }
