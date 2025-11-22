@@ -1,11 +1,9 @@
-package com.caycedo.registroganado.ui.compose.screens
+package com.caycedo.registroganado.ui_compose.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,53 +26,13 @@ fun RegisterScreen(navController: NavController) {
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
-    var rol by remember { mutableStateOf("propietario") }
-    var expanded by remember { mutableStateOf(false) }
-
     var message by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
-    // -------------------------------------------------------
-    // 🔥 Detectar si es el primer usuario registrado
-    // -------------------------------------------------------
-    var isFirstUser by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        dbRef.get().addOnSuccessListener { snap ->
-            if (!snap.hasChildren()) {
-                isFirstUser = true
-                rol = "administrador"
-            }
-        }
-    }
-
-    // -------------------------------------------------------
-    // 🔥 Rol del usuario que está logueado
-    // -------------------------------------------------------
-    val currentUserId = auth.currentUser?.uid
-    var currentUserRole by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        if (!isFirstUser && currentUserId != null) {
-            dbRef.child(currentUserId)
-                .child("rol")
-                .get()
-                .addOnSuccessListener {
-                    currentUserRole = it.value?.toString() ?: ""
-                }
-        }
-    }
-
-    // UI ----------------------------------------------------
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text("Registro de Usuario",
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                title = { Text("Registro de Usuario", fontWeight = FontWeight.Bold) }
             )
         }
     ) { pad ->
@@ -88,33 +46,30 @@ fun RegisterScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // 🔹 Nombre
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
                 label = { Text("Nombre completo") },
-                leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
+                leadingIcon = { Icon(Icons.Default.Person, null) },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 🔹 Correo
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Correo electrónico") },
-                leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = null) },
+                leadingIcon = { Icon(Icons.Default.MailOutline, null) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 12.dp)
             )
 
-            // 🔹 Contraseña
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },   // ← CORREGIDO
+                onValueChange = { password = it },
                 label = { Text("Contraseña") },
-                leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
+                leadingIcon = { Icon(Icons.Default.Lock, null) },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier
@@ -122,84 +77,8 @@ fun RegisterScreen(navController: NavController) {
                     .padding(top = 12.dp)
             )
 
-            Spacer(Modifier.height(20.dp))
-
-            // --------------------------------------------------------
-            // 🔥 Selector de rol
-            // --------------------------------------------------------
-            when {
-                // 1️⃣ Primer usuario → admin automático
-                isFirstUser -> {
-                    OutlinedTextField(
-                        value = "administrador",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Rol asignado automáticamente") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    rol = "administrador"
-                }
-
-                // 2️⃣ Admin creando usuarios → puede elegir rol
-                currentUserRole == "administrador" -> {
-
-                    val roles = listOf(
-                        "administrador",
-                        "propietario",
-                        "veterinario",
-                        "cuidador"
-                    )
-
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded }
-                    ) {
-                        OutlinedTextField(
-                            value = rol,
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text("Rol del usuario") },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                            modifier = Modifier
-                                .menuAnchor()
-                                .fillMaxWidth()
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            roles.forEach { item ->
-                                DropdownMenuItem(
-                                    text = { Text(item.replaceFirstChar { it.uppercase() }) },
-                                    onClick = {
-                                        rol = item
-                                        expanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // 3️⃣ Usuarios normales → dueño siempre
-                else -> {
-                    OutlinedTextField(
-                        value = "propietario",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Rol asignado") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    rol = "propietario"
-                }
-            }
-
             Spacer(Modifier.height(24.dp))
 
-            // --------------------------------------------------------
-            // 🔘 Botón Registrar
-            // --------------------------------------------------------
             Button(
                 onClick = {
                     if (nombre.isBlank() || email.isBlank() || password.isBlank()) {
@@ -208,47 +87,56 @@ fun RegisterScreen(navController: NavController) {
                     }
 
                     isLoading = true
+// aqui se crea que es el registro de usuario y se almacena en la base de datos linea 90 y 108
 
                     auth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener { task ->
+                            if (!task.isSuccessful) {
+                                message = "Error: ${task.exception?.message}"
+                                isLoading = false
+                                return@addOnCompleteListener
+                            }
+
+                            val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
+
+                            val userData = mapOf(
+                                "id" to uid,
+                                "nombre" to nombre,
+                                "email" to email,
+                                "rol" to "pendiente",
+                                "activo" to false,
+                                "fechaRegistro" to System.currentTimeMillis()
+                            )
+
+                            dbRef.child(uid).setValue(userData)
+
+                            auth.signOut()
+
+                            message = "✅ Registro exitoso. Tu cuenta está en revisión."
 
                             isLoading = false
-
-                            if (task.isSuccessful) {
-
-                                val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
-
-                                val userData = mapOf(
-                                    "id" to userId,
-                                    "nombre" to nombre,
-                                    "email" to email,
-                                    "rol" to rol,
-                                    "activo" to true
-                                )
-
-                                dbRef.child(userId).setValue(userData)
-
-                                navController.navigate("login") {
-                                    popUpTo("register") { inclusive = true }
-                                }
-
-                            } else {
-                                message = "Error: ${task.exception?.message}"
-                            }
                         }
                 },
                 enabled = !isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(if (isLoading) "Creando..." else "Registrar")
+                Text(if (isLoading) "Creando..." else "Registrarme")
             }
 
             if (message.isNotEmpty()) {
                 Text(
                     text = message,
-                    color = MaterialTheme.colorScheme.error,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(top = 12.dp)
                 )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            TextButton(
+                onClick = { navController.navigate("login") }
+            ) {
+                Text("¿Ya tienes cuenta? Inicia sesión")
             }
         }
     }

@@ -85,7 +85,7 @@ fun AddSupplyScreen(navController: NavController) {
                     if (nombre.isNotEmpty() && cantidad.isNotEmpty()) {
                         isSaving = true
                         val id = database.push().key ?: return@Button
-                        val nuevoInsumo = Insumo(id, nombre, cantidad, unidad, descripcion)
+                        val nuevoInsumo = Supply(id, nombre, cantidad, unidad, descripcion)
                         database.child(id).setValue(nuevoInsumo).addOnCompleteListener { task ->
                             isSaving = false
                             if (task.isSuccessful) {

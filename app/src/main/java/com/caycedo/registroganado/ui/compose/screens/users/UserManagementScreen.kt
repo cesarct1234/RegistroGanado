@@ -1,8 +1,6 @@
-package com.caycedo.registroganado.ui.compose.screens.users
+package com.caycedo.registroganado.ui_compose.screens.users
 
-import android.widget.Toast
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,298 +11,342 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.caycedo.registroganado.ui.compose.nav.NavRoutes
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-
-data class Usuario(
-    val id: String = "",
-    val nombre: String = "",
-    val email: String = "",
-    val rol: String = "",
-    val activo: Boolean = true
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserManagementScreen(navController: NavController) {
 
-    val db = FirebaseDatabase.getInstance().getReference("usuarios")
-    val context = LocalContext.current
+    val dbRef = FirebaseDatabase.getInstance().getReference("usuarios")
+    val auth = FirebaseAuth.getInstance()
 
-    var usuarios by remember { mutableStateOf(listOf<Usuario>()) }
+    var usuarios by remember { mutableStateOf(listOf<UserData>()) }
+    var showApprovalDialog by remember { mutableStateOf<UserData?>(null) }
+    var showEditDialog by remember { mutableStateOf<UserData?>(null) }
+    var showDisableDialog by remember { mutableStateOf<UserData?>(null) }
+    var showDeleteDialog by remember { mutableStateOf<UserData?>(null) }
 
-    fun cargarUsuarios() {
-        db.get().addOnSuccessListener { snap ->
-
-            val lista = mutableListOf<Usuario>()
-
-            for (u in snap.children) {
-
-                val map = u.value
-
-                // 🔥 FILTRO REAL: solo aceptar si es un MAPA y contiene "email"
-                if (map is Map<*, *> && map.containsKey("email")) {
-
-                    val user = u.getValue(Usuario::class.java)
-
-                    if (user != null && user.id.isNotBlank()) {
-                        lista.add(user)
+    LaunchedEffect(true) {
+        dbRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val list = mutableListOf<UserData>()
+                for (child in snapshot.children) {
+                    val id = child.child("id").value?.toString() ?: ""
+                    val nombre = child.child("nombre").value?.toString() ?: ""
+                    val email = child.child("email").value?.toString() ?: ""
+                    val rol = child.child("rol").value?.toString() ?: "pendiente"
+                    val activo = child.child("activo").getValue(Boolean::class.java) ?: false
+                    if (id.isNotEmpty()) {
+                        list.add(UserData(id, nombre, email, rol, activo))
                     }
                 }
+                usuarios = list
             }
 
-            usuarios = lista
-        }
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
-
-
-
-
-
-    LaunchedEffect(Unit) { cargarUsuarios() }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Gestión de Usuarios") },
+                title = { Text("Gestión de Usuarios", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Default.ArrowBack, "Volver")
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, null)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFFA8D89F)
+                )
             )
         }
-    ) { pad ->
+    ) { padding ->
 
         Column(
-            Modifier
-                .padding(pad)
-                .padding(16.dp)
+            modifier = Modifier
+                .padding(padding)
                 .fillMaxSize()
+                .background(Color(0xFFE8F5E9))
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            Button(
-                onClick = { navController.navigate(NavRoutes.CREATE_USER) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50),
-                    contentColor = Color.White
-                )
-            ) {
-                Icon(Icons.Default.Add, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text("Crear usuario")
+            SectionHeader("Pendientes por aprobación")
+
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                items(usuarios.filter { it.rol == "pendiente" }) { user ->
+                    UserCard(
+                        user = user,
+                        color = Color(0xFFFFEB3B),
+                        showApprovalDialog = { showApprovalDialog = it },
+                        showEditDialog = { showEditDialog = it },
+                        showDisableDialog = { showDisableDialog = it },
+                        showDeleteDialog = { showDeleteDialog = it }
+                    )
+                }
             }
 
-            Spacer(Modifier.height(20.dp))
+            Divider()
 
-            if (usuarios.isEmpty()) {
-                Box(
-                    Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No hay usuarios registrados")
-                }
-            } else {
+            SectionHeader("Usuarios activos")
 
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(usuarios) { user ->
-
-                        UserCard(
-                            user = user,
-                            navController = navController,
-                            onToggleActivo = {
-                                val nuevo = !user.activo
-                                db.child(user.id).child("activo").setValue(nuevo)
-                                cargarUsuarios()
-
-                                Toast.makeText(
-                                    context,
-                                    if (nuevo) "Usuario activado" else "Usuario desactivado",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
-                            },
-                            onChangeRol = { nuevoRol ->
-                                db.child(user.id).child("rol").setValue(nuevoRol)
-                                cargarUsuarios()
-                                Toast.makeText(context, "Rol actualizado", Toast.LENGTH_SHORT).show()
-                            },
-                            onDelete = {
-                                db.child(user.id).removeValue()
-                                cargarUsuarios()
-                                Toast.makeText(context, "Usuario eliminado", Toast.LENGTH_SHORT).show()
-                            }
-                        )
-                    }
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                items(usuarios.filter { it.rol != "pendiente" }) { user ->
+                    UserCard(
+                        user = user,
+                        color = Color(0xFFB2FFC3),
+                        showApprovalDialog = { showApprovalDialog = it },
+                        showEditDialog = { showEditDialog = it },
+                        showDisableDialog = { showDisableDialog = it },
+                        showDeleteDialog = { showDeleteDialog = it }
+                    )
                 }
             }
         }
     }
+
+    if (showApprovalDialog != null) {
+        ApproveUserDialog(showApprovalDialog!!) { showApprovalDialog = null }
+    }
+
+    if (showEditDialog != null) {
+        EditUserDialog(showEditDialog!!) { showEditDialog = null }
+    }
+
+    if (showDisableDialog != null) {
+        DisableUserDialog(showDisableDialog!!) { showDisableDialog = null }
+    }
+
+    if (showDeleteDialog != null) {
+        DeleteUserDialog(showDeleteDialog!!) { showDeleteDialog = null }
+    }
 }
+
+data class UserData(
+    val id: String,
+    val nombre: String,
+    val email: String,
+    val rol: String,
+    val activo: Boolean
+)
+
 @Composable
 fun UserCard(
-    user: Usuario,
-    navController: NavController,
-    onToggleActivo: () -> Unit,
-    onChangeRol: (String) -> Unit,
-    onDelete: () -> Unit
+    user: UserData,
+    color: Color,
+    showApprovalDialog: (UserData) -> Unit,
+    showEditDialog: (UserData) -> Unit,
+    showDisableDialog: (UserData) -> Unit,
+    showDeleteDialog: (UserData) -> Unit
 ) {
-
-    var showRoleDialog by remember { mutableStateOf(false) }
-
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor =
-                if (user.activo) MaterialTheme.colorScheme.surfaceVariant
-                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp),
+        onClick = {}
     ) {
-
         Column(Modifier.padding(16.dp)) {
+            Text(user.nombre, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Text(
+                user.email,
+                fontSize = 14.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(bottom = 6.dp)
+            )
 
-                Column {
-                    Text(user.nombre, fontWeight = FontWeight.Bold)
-                    Text(user.email, color = Color.DarkGray)
-                    Text("Rol: ${user.rol}", fontWeight = FontWeight.SemiBold)
-                    if (!user.activo) {
-                        Text("(INACTIVO)", color = Color.Red)
-                    }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                AssistChip(
+                    onClick = {},
+                    label = { Text(user.rol.uppercase()) },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = color
+                    )
+                )
+
+                AssistChip(
+                    onClick = {},
+                    label = { Text(if (user.activo) "ACTIVO" else "INACTIVO") },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = if (user.activo) Color(0xFFB2FFC3) else Color(0xFFFFCDD2)
+                    )
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+
+                if (user.rol == "pendiente") {
+                    Button(
+                        onClick = { showApprovalDialog(user) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                    ) { Text("Aprobar") }
                 }
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                OutlinedButton(onClick = { showEditDialog(user) }) {
+                    Text("Editar")
+                }
+
+                OutlinedButton(
+                    onClick = { showDisableDialog(user) },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = if (user.activo) Color.Red else Color(0xFF4CAF50)
+                    )
                 ) {
-
-                    //------------------------------------------------------
-                    //  EDITAR
-                    //------------------------------------------------------
-                    Icon(
-                        Icons.Default.Edit,
-                        contentDescription = "Editar usuario",
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() }
-                            ) {
-                                navController.navigate("${NavRoutes.EDIT_USER}/${user.id}")
-                            }
-                    )
-
-                    //------------------------------------------------------
-                    //  CAMBIAR ROL
-                    //------------------------------------------------------
-                    Icon(
-                        Icons.Default.ManageAccounts,
-                        contentDescription = "Cambiar rol",
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() }
-                            ) {
-                                showRoleDialog = true
-                            }
-                    )
-
-                    //------------------------------------------------------
-                    //  ACTIVAR / DESACTIVAR
-                    //------------------------------------------------------
-                    Icon(
-                        if (user.activo) Icons.Default.Block else Icons.Default.Check,
-                        contentDescription = "Act/Desactivar",
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() }
-                            ) {
-                                onToggleActivo()
-                            }
-                    )
-
-                    //------------------------------------------------------
-                    //  ELIMINAR
-                    //------------------------------------------------------
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Eliminar",
-                        tint = Color.Red,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() }
-                            ) {
-                                onDelete()
-                            }
-                    )
+                    Text(if (user.activo) "Desactivar" else "Activar")
                 }
+
+                OutlinedButton(
+                    onClick = { showDeleteDialog(user) },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red)
+                ) { Text("Eliminar") }
             }
         }
     }
+}
 
-    //-------------------------------------------------------------------
-    //  DIALOG PARA CAMBIAR EL ROL
-    //-------------------------------------------------------------------
-    if (showRoleDialog) {
-        AlertDialog(
-            onDismissRequest = { showRoleDialog = false },
-            title = { Text("Cambiar rol de usuario") },
+@Composable
+fun SectionHeader(title: String) {
+    Text(
+        text = title,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color(0xFF2E7D32)
+    )
+}
 
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+@Composable
+fun ApproveUserDialog(user: UserData, onDismiss: () -> Unit) {
+    val dbRef = FirebaseDatabase.getInstance().getReference("usuarios")
+    var rol by remember { mutableStateOf("propietario") }
 
-                    val roles = listOf(
-                        "administrador",
-                        "propietario",
-                        "veterinario",
-                        "cuidador"
-                    )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Aprobar Usuario") },
+        text = {
+            Column {
+                Text("Selecciona el rol del usuario")
+                Spacer(Modifier.height(10.dp))
 
-                    roles.forEach { rol ->
+                val roles = listOf("administrador", "veterinario", "cuidador", "propietario")
 
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .clickable(
-                                    indication = null,
-                                    interactionSource = remember { MutableInteractionSource() }
-                                ) {
-                                    onChangeRol(rol)
-                                    showRoleDialog = false
-                                }
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Default.Person, contentDescription = null)
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(rol.uppercase())
-                        }
+                roles.forEach {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = rol == it,
+                            onClick = { rol = it }
+                        )
+                        Text(it.uppercase())
                     }
                 }
-            },
-
-            confirmButton = {
-                TextButton(
-                    onClick = { showRoleDialog = false }
-                ) {
-                    Text("Cerrar")
-                }
             }
-        )
-    }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    dbRef.child(user.id).child("rol").setValue(rol)
+                    dbRef.child(user.id).child("activo").setValue(true)
+                    onDismiss()
+                }
+            ) { Text("Aprobar") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar") }
+        }
+    )
 }
+
+@Composable
+fun EditUserDialog(user: UserData, onDismiss: () -> Unit) {
+    val dbRef = FirebaseDatabase.getInstance().getReference("usuarios")
+    var nombre by remember { mutableStateOf(user.nombre) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Editar Usuario") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre") }
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    dbRef.child(user.id).child("nombre").setValue(nombre)
+                    onDismiss()
+                }
+            ) { Text("Guardar") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar") }
+        }
+    )
+}
+
+@Composable
+fun DisableUserDialog(user: UserData, onDismiss: () -> Unit) {
+    val dbRef = FirebaseDatabase.getInstance().getReference("usuarios")
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(if (user.activo) "Desactivar Usuario" else "Activar Usuario") },
+        text = {
+            Text(
+                if (user.activo)
+                    "El usuario no podrá iniciar sesión hasta ser activado."
+                else
+                    "El usuario podrá ingresar nuevamente."
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    dbRef.child(user.id).child("activo").setValue(!user.activo)
+                    onDismiss()
+                }
+            ) { Text(if (user.activo) "Desactivar" else "Activar") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar") }
+        }
+    )
+}
+
+@Composable
+fun DeleteUserDialog(user: UserData, onDismiss: () -> Unit) {
+    val dbRef = FirebaseDatabase.getInstance().getReference("usuarios")
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Eliminar Usuario") },
+        text = { Text("Esta acción no se puede deshacer.") },
+        confirmButton = {
+            Button(
+                onClick = {
+                    dbRef.child(user.id).removeValue()
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) { Text("Eliminar") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancelar") }
+        }
+    )
+}
+
 
