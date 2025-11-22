@@ -1,12 +1,7 @@
 package com.caycedo.registroganado.ui_compose.screens.roles
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,21 +29,19 @@ import androidx.compose.ui.draw.clip
 fun AdminHomeScreen(navController: NavController) {
 
     val auth = FirebaseAuth.getInstance()
-    val currentUser = auth.currentUser
+    val uid = auth.currentUser?.uid ?: ""
     val dbRef = FirebaseDatabase.getInstance().getReference("usuarios")
 
-    var userName by remember { mutableStateOf("Administrador") }
-    var userEmail by remember { mutableStateOf(currentUser?.email ?: "") }
+    var nombre by remember { mutableStateOf("Administrador") }
+    var email by remember { mutableStateOf("") }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    // Cargar nombre del usuario
-    LaunchedEffect(Unit) {
-        currentUser?.uid?.let { uid ->
-            dbRef.child(uid).get().addOnSuccessListener { snapshot ->
-                val nombre = snapshot.child("nombre").value?.toString()
-                if (!nombre.isNullOrEmpty()) {
-                    userName = nombre
-                }
+    // Cargar datos del usuario
+    LaunchedEffect(uid) {
+        if (uid.isNotEmpty()) {
+            dbRef.child(uid).get().addOnSuccessListener { snap ->
+                nombre = snap.child("nombre").value?.toString() ?: "Administrador"
+                email = snap.child("email").value?.toString() ?: ""
             }
         }
     }
@@ -63,7 +56,7 @@ fun AdminHomeScreen(navController: NavController) {
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            "Bienvenido, $userName",
+                            "Bienvenido, $nombre",
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -96,41 +89,53 @@ fun AdminHomeScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            // Card de bienvenida con imagen
+            // Card de bienvenida principal
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFC8E6C9)
+                    containerColor = Color(0xFFB9E4B6)
                 ),
-                elevation = CardDefaults.cardElevation(4.dp)
+                elevation = CardDefaults.cardElevation(6.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             "Gestión Ganadera",
-                            fontSize = 20.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2E7D32)
+                            color = Color(0xFF1B5E20)
                         )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            userEmail,
-                            fontSize = 13.sp,
-                            color = Color(0xFF558B2F)
-                        )
+                        Spacer(Modifier.height(8.dp))
+                        if (nombre.isNotEmpty()) {
+                            Text(
+                                nombre,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF2E7D32)
+                            )
+                        }
+                        if (email.isNotEmpty()) {
+                            Text(
+                                email,
+                                fontSize = 13.sp,
+                                color = Color(0xFF33691E)
+                            )
+                        }
                     }
-                    Image(
-                        painter = painterResource(id = R.drawable.imglogin),
-                        contentDescription = "Logo",
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.logo_ganaderia),
+                        contentDescription = "Logo Ganadería",
                         modifier = Modifier
                             .size(80.dp)
-                            .clip(MaterialTheme.shapes.medium)
+                            .clip(MaterialTheme.shapes.medium),
+                        tint = Color.Unspecified
                     )
                 }
             }
@@ -161,7 +166,7 @@ fun AdminHomeScreen(navController: NavController) {
                 }
             }
 
-            AdminItem(
+            AdminItemFull(
                 title = "Registro de Insumos",
                 description = "Control de inventario y suministros",
                 icon = Icons.Default.Inventory,
@@ -170,10 +175,20 @@ fun AdminHomeScreen(navController: NavController) {
                 navController.navigate(NavRoutes.SUPPLIES)
             }
 
+            AdminItemFull(
+                title = "Solicitudes Pendientes",
+                description = "Usuarios nuevos esperando aprobación",
+                icon = Icons.Default.Pending,
+                color = Color(0xFF6A1B9A)
+            ) {
+                navController.navigate(NavRoutes.PENDING_REQUESTS)
+            }
+
+
             // Sección: Reportes y Análisis
             SectionHeader("Reportes y Análisis")
 
-            AdminItem(
+            AdminItemFull(
                 title = "Reportes Estadísticos",
                 description = "Visualiza producción y estadísticas",
                 icon = Icons.Default.BarChart,
@@ -182,7 +197,7 @@ fun AdminHomeScreen(navController: NavController) {
                 navController.navigate(NavRoutes.REPORTS)
             }
 
-            AdminItem(
+            AdminItemFull(
                 title = "Exportar a PDF",
                 description = "Genera reportes completos en PDF",
                 icon = Icons.Default.PictureAsPdf,
@@ -191,19 +206,21 @@ fun AdminHomeScreen(navController: NavController) {
                 navController.navigate(NavRoutes.REPORTS_EXPORT)
             }
 
+            AdminItemFull(
+                title = "Gestión de Excel",
+                description = "Importar o exportar datos",
+                icon = Icons.Default.UploadFile,
+                color = Color(0xFF388E3C)
+            ) {
+                navController.navigate(NavRoutes.EXCEL_MANAGER)
+            }
+
+
             // Sección: Herramientas
             SectionHeader("Herramientas")
 
-            AdminItem(
-                title = "Importar desde Excel",
-                description = "Carga masiva de animales",
-                icon = Icons.Default.Upload,
-                color = Color(0xFF388E3C)
-            ) {
-                navController.navigate(NavRoutes.EXCEL_IMPORT)
-            }
 
-            // Espaciado final
+
             Spacer(Modifier.height(16.dp))
         }
     }
@@ -230,11 +247,26 @@ fun AdminHomeScreen(navController: NavController) {
                 Column {
                     Text("¿Estás seguro de que deseas cerrar sesión?")
                     Spacer(Modifier.height(8.dp))
-                    Text(
-                        "Usuario: $userName",
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                "Usuario: $nombre",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            if (email.isNotEmpty()) {
+                                Text(
+                                    email,
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
                 }
             },
             confirmButton = {
@@ -285,25 +317,17 @@ fun SectionHeader(title: String) {
 }
 
 @Composable
-fun AdminItem(
+fun AdminItemFull(
     title: String,
     description: String,
     icon: ImageVector,
     color: Color = Color(0xFF2E7D32),
     onClick: () -> Unit
 ) {
-    var isPressed by remember { mutableStateOf(false) }
-
     Card(
-        modifier = Modifier
-            .fillMaxWidth(),
-        onClick = {
-            isPressed = true
-            onClick()
-        },
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isPressed) 8.dp else 4.dp
-        ),
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick,
+        elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -315,6 +339,7 @@ fun AdminItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Icono con fondo
             Surface(
                 color = color.copy(alpha = 0.15f),
                 shape = MaterialTheme.shapes.medium,
@@ -356,13 +381,6 @@ fun AdminItem(
             )
         }
     }
-
-    LaunchedEffect(isPressed) {
-        if (isPressed) {
-            kotlinx.coroutines.delay(100)
-            isPressed = false
-        }
-    }
 }
 
 @Composable
@@ -374,12 +392,8 @@ fun AdminItemCompact(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = modifier
-            .height(110.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onClick() },
+        modifier = modifier.height(110.dp),
+        onClick = onClick,
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -419,5 +433,3 @@ fun AdminItemCompact(
         }
     }
 }
-
-

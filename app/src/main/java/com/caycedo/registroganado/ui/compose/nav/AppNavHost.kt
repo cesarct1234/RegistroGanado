@@ -13,8 +13,12 @@ import com.caycedo.registroganado.ui.compose.screens.supplies.*
 import com.caycedo.registroganado.ui.compose.screens.reports.*
 import com.caycedo.registroganado.ui_compose.screens.roles.*
 import com.caycedo.registroganado.ui.compose.screens.ProductionScreen
-import com.caycedo.registroganado.ui.compose.screens.RegisterScreen
+import com.caycedo.registroganado.ui.compose.screens.reports.widgets.ReportsScreen
+//import com.caycedo.registroganado.ui.compose.screens.RegisterScreen
+//import com.caycedo.registroganado.ui.compose.screens.roles.AdminHomeScreen
 import com.caycedo.registroganado.ui_compose.screens.users.CreateUserScreen
+import com.caycedo.registroganado.ui_compose.screens.users.PendingRequestsScreen
+import com.caycedo.registroganado.ui_compose.screens.users.UserManagementScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
@@ -48,7 +52,12 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         composable(NavRoutes.CREATE_USER) { CreateUserScreen(navController) }
         composable("${NavRoutes.EDIT_USER}/{userId}") { back ->
             EditUserScreen(navController, back.arguments?.getString("userId") ?: "")
+
+            }
+        composable(NavRoutes.PENDING_REQUESTS) {
+            PendingRequestsScreen(navController)
         }
+
 
         // 🔵 ANIMALES
         composable(NavRoutes.LIST_ANIMALS) {
@@ -81,10 +90,18 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         // 🔵 REPORTES / PRODUCCIÓN
         composable(NavRoutes.PRODUCTIONS) { ProductionScreen(navController) }
         composable(NavRoutes.REPORTS) { ReportsScreen(navController) }
-        composable(NavRoutes.REPORTS_PRODUCTION) { ReportsProductionScreen(navController) }
+
         composable(NavRoutes.REPORTS_EXPORT) { GenerateReportScreen(navController) }
 
-        // 🔵 IMPORTAR EXCEL (CORRECTO)
-        composable(NavRoutes.EXCEL_IMPORT) { ExcelImportScreen(navController) }
+        // 🔵 IMPORTAR / EXPORTAR EXCEL (CORRECTO)
+
+
+        composable(NavRoutes.EXCEL_MANAGER) {
+            ExcelManagerScreen(navController)
+        }
+
     }
 }
+
+
+

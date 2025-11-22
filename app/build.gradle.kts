@@ -57,6 +57,7 @@ android {
 
 dependencies {
 
+    implementation(libs.ui.text)
     // --- DESUGAR (Java 8+ para POI Excel) ---
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
@@ -68,6 +69,7 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)
     debugImplementation(libs.compose.ui.tooling)
+
 
     // --- Foundation moderno (del catalogo) ---
     implementation(libs.foundation)
@@ -83,9 +85,11 @@ dependencies {
     // --- Coil imágenes ---
     implementation("io.coil-kt:coil-compose:2.6.0")
 
-    // --- Vico charts (gráficos premium) ---
-    implementation("com.patrykandpatrick.vico:core:1.14.0")
-    implementation("com.patrykandpatrick.vico:compose-m3:1.14.0")
+    // --- YML charts (gráficos) ---
+
+    implementation("co.yml:ycharts:2.1.0")
+
+
 
     // --- CSV ---
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3")

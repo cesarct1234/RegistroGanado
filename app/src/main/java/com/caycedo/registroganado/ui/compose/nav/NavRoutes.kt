@@ -17,6 +17,7 @@ object NavRoutes {
     const val USERS_MANAGEMENT = "gestionUsuarios"
     const val CREATE_USER = "createUser"
     const val EDIT_USER = "editUser"
+    const val PENDING_REQUESTS = "pendingRequests"
 
     // Animales
     const val LIST_ANIMALS = "listAnimals"
@@ -36,6 +37,8 @@ object NavRoutes {
     const val REPORTS_PRODUCTION = "reportsProduction"
 
     // Nuevas rutas
-    const val EXCEL_IMPORT = "excel_import"
+
+    const val EXCEL_MANAGER = "excel_manager"
+
     const val REPORTS_EXPORT = "report_export"
 }
