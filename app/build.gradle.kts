@@ -58,6 +58,7 @@ android {
 dependencies {
 
     implementation(libs.ui.text)
+    implementation(libs.androidx.ui.text)
     // --- DESUGAR (Java 8+ para POI Excel) ---
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 

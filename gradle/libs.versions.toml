@@ -18,6 +18,7 @@ uiText = "1.9.4"
 animation = "1.9.4"
 pdfViewer = "1.0.0-alpha11"
 ui = "1.9.4"
+uiTextVersion = "1.9.5"
 
 [libraries]
 # ✅ Jetpack Compose (usando BOM para versiones coordinadas)
@@ -44,6 +45,7 @@ ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiTe
 animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
 pdf-viewer = { group = "androidx.pdf", name = "pdf-viewer", version.ref = "pdfViewer" }
 ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+androidx-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiTextVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -68,7 +68,10 @@ fun AnimalListScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            items(animales) { animal ->
+            items(
+                items = animales,
+                key = { it.id }      // ← SOLUCIÓN: clave estable evita Tag mismatch
+            ) { animal ->
 
                 Card(
                     modifier = Modifier
@@ -94,6 +97,5 @@ fun AnimalListScreen(navController: NavController) {
         }
     }
 }
-
 
 

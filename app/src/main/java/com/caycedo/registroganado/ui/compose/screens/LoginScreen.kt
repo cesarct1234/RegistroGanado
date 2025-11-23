@@ -249,24 +249,35 @@ fun LoginScreen(navController: NavController) {
                                         isLoading = false
                                         sessionVM.setSession(uid, rol)
 
+
+                                        val user = FirebaseAuth.getInstance().currentUser
+                                        if (user == null) {
+                                            message = "Error inesperado: usuario no encontrado"
+                                            return@addOnSuccessListener
+                                        }
                                         when (rol) {
                                             "administrador" -> navController.navigate(NavRoutes.ADMIN_HOME) {
                                                 popUpTo(0) { inclusive = true }
                                             }
+
                                             "veterinario" -> navController.navigate(NavRoutes.VET_HOME) {
                                                 popUpTo(0) { inclusive = true }
                                             }
-                                            "cuidador" -> navController.navigate(NavRoutes.CUIDADOR_HOME) {
+
+                                            "cuidador" -> navController.navigate("${NavRoutes.CUIDADOR_HOME}/${user.uid}") {
                                                 popUpTo(0) { inclusive = true }
                                             }
-                                            "propietario" -> navController.navigate(NavRoutes.PROP_HOME) {
+
+                                            "propietario" -> navController.navigate("${NavRoutes.PROP_HOME}/${user.uid}") {
                                                 popUpTo(0) { inclusive = true }
                                             }
+
                                             else -> {
                                                 message = "❓ Rol desconocido: $rol"
                                                 auth.signOut()
                                             }
                                         }
+
 
                                     }.addOnFailureListener {
                                         message = "❌ Error al obtener datos del usuario"

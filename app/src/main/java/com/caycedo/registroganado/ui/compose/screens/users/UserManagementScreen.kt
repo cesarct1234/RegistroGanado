@@ -83,12 +83,14 @@ fun UserManagementScreen(navController: NavController) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 items(usuarios.filter { it.rol == "pendiente" }) { user ->
                     UserCard(
+                        navController = navController,
                         user = user,
                         color = Color(0xFFFFEB3B),
                         showApprovalDialog = { showApprovalDialog = it },
                         showEditDialog = { showEditDialog = it },
                         showDisableDialog = { showDisableDialog = it },
-                        showDeleteDialog = { showDeleteDialog = it }
+                        showDeleteDialog = { showDeleteDialog = it },
+
                     )
                 }
             }
@@ -100,12 +102,14 @@ fun UserManagementScreen(navController: NavController) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 items(usuarios.filter { it.rol != "pendiente" }) { user ->
                     UserCard(
+                        navController = navController,
                         user = user,
                         color = Color(0xFFB2FFC3),
                         showApprovalDialog = { showApprovalDialog = it },
                         showEditDialog = { showEditDialog = it },
                         showDisableDialog = { showDisableDialog = it },
-                        showDeleteDialog = { showDeleteDialog = it }
+                        showDeleteDialog = { showDeleteDialog = it },
+
                     )
                 }
             }
@@ -139,13 +143,15 @@ data class UserData(
 
 @Composable
 fun UserCard(
+    navController: NavController,
     user: UserData,
     color: Color,
     showApprovalDialog: (UserData) -> Unit,
     showEditDialog: (UserData) -> Unit,
     showDisableDialog: (UserData) -> Unit,
     showDeleteDialog: (UserData) -> Unit
-) {
+)
+ {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -191,9 +197,12 @@ fun UserCard(
                     ) { Text("Aprobar") }
                 }
 
-                OutlinedButton(onClick = { showEditDialog(user) }) {
+                OutlinedButton(
+                    onClick = { navController.navigate("${NavRoutes.EDIT_USER}/${user.id}") }
+                ) {
                     Text("Editar")
                 }
+
 
                 OutlinedButton(
                     onClick = { showDisableDialog(user) },

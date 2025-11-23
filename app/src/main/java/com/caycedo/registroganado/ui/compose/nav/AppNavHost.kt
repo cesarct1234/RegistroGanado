@@ -29,6 +29,8 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
     ) {
 
         // 🔵 AUTENTICACIÓN
+
+
         composable(NavRoutes.WELCOME) { WelcomeScreen(navController) }
         composable(NavRoutes.LOGIN) { LoginScreen(navController) }
         composable(NavRoutes.REGISTER) { RegisterScreen(navController) }
@@ -41,6 +43,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             val propietarioId = back.arguments?.getString("propietarioId") ?: ""
             PropHomeScreen(navController, propietarioId)
         }
+
 
         composable("${NavRoutes.CUIDADOR_HOME}/{cuidadorId}") { back ->
             val cuidadorId = back.arguments?.getString("cuidadorId") ?: ""
