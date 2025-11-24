@@ -14,6 +14,7 @@ import com.caycedo.registroganado.ui.compose.screens.reports.*
 import com.caycedo.registroganado.ui_compose.screens.roles.*
 import com.caycedo.registroganado.ui.compose.screens.ProductionScreen
 import com.caycedo.registroganado.ui.compose.screens.reports.widgets.ReportsScreen
+import com.caycedo.registroganado.ui_compose.screens.animals.AnimalListScreen
 //import com.caycedo.registroganado.ui.compose.screens.RegisterScreen
 //import com.caycedo.registroganado.ui.compose.screens.roles.AdminHomeScreen
 import com.caycedo.registroganado.ui_compose.screens.users.CreateUserScreen
@@ -67,13 +68,11 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             AnimalListScreen(navController)
         }
 
-        composable("${NavRoutes.ADD_ANIMAL}/{propietarioId}") { back ->
-            AddAnimalScreen(
-                navController,
-                animalIdParam = null,
-                propietarioIdParam = back.arguments?.getString("propietarioId")
-            )
+        composable("${NavRoutes.ADD_ANIMAL}/{propietarioId}") { backStackEntry ->
+            val propietarioId = backStackEntry.arguments?.getString("propietarioId")
+            AddAnimalScreen(navController, null, propietarioId)
         }
+
 
         composable("${NavRoutes.EDIT_ANIMAL}/{propietarioId}/{animalId}") { back ->
             AddAnimalScreen(

@@ -1,4 +1,4 @@
-package com.caycedo.registroganado.ui.compose.screens.animals
+package com.caycedo.registroganado.ui_compose.screens.animals
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,11 +10,13 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.caycedo.registroganado.ui.compose.nav.NavRoutes
+import com.caycedo.registroganado.ui.compose.screens.animals.Animal
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
@@ -22,19 +24,55 @@ import com.google.firebase.database.*
 @Composable
 fun AnimalListScreen(navController: NavController) {
 
-    val db = FirebaseDatabase.getInstance().getReference("animales_global")
-    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    val dbAnimals = FirebaseDatabase.getInstance().getReference("animales_global")
+    val dbUsers = FirebaseDatabase.getInstance().getReference("usuarios")
+
+    val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
     var animales by remember { mutableStateOf(listOf<Animal>()) }
+    var rol by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit) {
-        db.addValueEventListener(object : ValueEventListener {
+    // 1️⃣ Primero obtener el rol del usuario
+    LaunchedEffect(uid) {
+        dbUsers.child(uid).get()
+            .addOnSuccessListener { snap ->
+                rol = snap.child("rol").value?.toString()?.lowercase()?.trim()
+            }
+    }
+
+    // 2️⃣ Mientras rol es null → loader
+    if (rol == null) {
+        Box(
+            Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
+    // 3️⃣ Cargar animales SOLO después de que rol ya está disponible
+    LaunchedEffect(rol) {
+        dbAnimals.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val list = mutableListOf<Animal>()
+
+                val lista = mutableListOf<Animal>()
+
                 for (child in snapshot.children) {
-                    child.getValue(Animal::class.java)?.let { list.add(it) }
+                    val animal = child.getValue(Animal::class.java) ?: continue
+
+                    val permitir = when (rol) {
+                        "administrador" -> true
+                        "veterinario" -> true
+                        "cuidador" -> animal.activo == true
+                        "propietario" -> animal.propietarioId == uid
+                        else -> false
+                    }
+
+                    if (permitir) lista.add(animal)
                 }
-                animales = list
+
+                animales = lista
             }
 
             override fun onCancelled(error: DatabaseError) {}
@@ -51,10 +89,12 @@ fun AnimalListScreen(navController: NavController) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                        navController.navigate("${NavRoutes.ADD_ANIMAL}/$uid")
-                    }) {
-                        Icon(Icons.Default.Add, null)
+                    if (rol == "administrador" || rol == "propietario") {
+                        IconButton(onClick = {
+                            navController.navigate("${NavRoutes.ADD_ANIMAL}/$uid")
+                        }) {
+                            Icon(Icons.Default.Add, null)
+                        }
                     }
                 }
             )
@@ -68,10 +108,7 @@ fun AnimalListScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            items(
-                items = animales,
-                key = { it.id }      // ← SOLUCIÓN: clave estable evita Tag mismatch
-            ) { animal ->
+            items(animales) { animal ->
 
                 Card(
                     modifier = Modifier
@@ -97,5 +134,3 @@ fun AnimalListScreen(navController: NavController) {
         }
     }
 }
-
-

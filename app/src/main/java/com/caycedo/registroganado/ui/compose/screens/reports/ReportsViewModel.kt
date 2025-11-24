@@ -14,7 +14,9 @@ class ReportsViewModel : ViewModel() {
 
     private val db = FirebaseDatabase.getInstance()
 
-    // Totales
+    // ------------------------------
+    // CONTADORES GENERALES
+    // ------------------------------
     private val _totalAnimales = MutableStateFlow(0)
     val totalAnimales: StateFlow<Int> = _totalAnimales
 
@@ -27,7 +29,9 @@ class ReportsViewModel : ViewModel() {
     private val _promedioLeche = MutableStateFlow(0.0)
     val promedioLeche: StateFlow<Double> = _promedioLeche
 
-    // Gráficas
+    // ------------------------------
+    // MAPAS PARA GRÁFICAS
+    // ------------------------------
     private val _distribucionRaza = MutableStateFlow<Map<String, Int>>(emptyMap())
     val distribucionRaza: StateFlow<Map<String, Int>> = _distribucionRaza
 
@@ -50,16 +54,15 @@ class ReportsViewModel : ViewModel() {
     val aptoConsumo: StateFlow<Map<String, Int>> = _aptoConsumo
 
 
-
-
-
-
     init {
         cargarAnimales()
         cargarInsumos()
         cargarProduccion()
     }
 
+    // ========================================================================================
+    // CARGAR ANIMALES
+    // ========================================================================================
     private fun cargarAnimales() {
         viewModelScope.launch {
             db.getReference("animales_global")
@@ -78,36 +81,39 @@ class ReportsViewModel : ViewModel() {
                         var aptos = 0
                         var noAptos = 0
 
-
                         for (child in snapshot.children) {
+
                             val a = child.getValue(Animal::class.java) ?: continue
                             total++
 
-                            // Producción promedio
+                            // ---- Producción
                             val leche = a.produccionLeche.toDoubleOrNull() ?: 0.0
                             litrosTotales += leche
                             produccionAnimal[a.nombre] = leche
 
-                            // Raza
+                            // ---- Raza
                             razas[a.raza] = (razas[a.raza] ?: 0) + 1
 
-                            // Sexo
+                            // ---- Sexo
                             sexos[a.sexo] = (sexos[a.sexo] ?: 0) + 1
 
-                            // Vacunas (cuenta cuántas vacunas se aplican por tipo)
+                            // ---- Vacunas
                             a.vacunaciones.split(",").forEach { v ->
-                                val vTrim = v.trim()
-                                if (vTrim.isNotEmpty()) vacunasMap[vTrim] = (vacunasMap[vTrim] ?: 0) + 1
+                                val vacuna = v.trim()
+                                if (vacuna.isNotEmpty()) {
+                                    vacunasMap[vacuna] = (vacunasMap[vacuna] ?: 0) + 1
+                                }
                             }
 
-// Estado reproductivo
+                            // ---- Estado reproductivo
                             estadoRepMap[a.estadoReproductivo] =
                                 (estadoRepMap[a.estadoReproductivo] ?: 0) + 1
 
-// Apto consumo
+                            // ---- Apto consumo
                             if (a.aptoConsumo) aptos++ else noAptos++
                         }
 
+                        // Asignar valores
                         _totalAnimales.value = total
                         _promedioLeche.value = if (total > 0) litrosTotales / total else 0.0
 
@@ -117,7 +123,6 @@ class ReportsViewModel : ViewModel() {
                         _vacunas.value = vacunasMap
                         _estadoReproductivo.value = estadoRepMap
                         _aptoConsumo.value = mapOf("Aptos" to aptos, "No aptos" to noAptos)
-
                     }
 
                     override fun onCancelled(error: DatabaseError) {}
@@ -125,12 +130,16 @@ class ReportsViewModel : ViewModel() {
         }
     }
 
+    // ========================================================================================
+    // CARGAR INSUMOS
+    // ========================================================================================
     private fun cargarInsumos() {
         viewModelScope.launch {
             db.getReference("insumos")
                 .addValueEventListener(object : ValueEventListener {
 
                     override fun onDataChange(snapshot: DataSnapshot) {
+
                         var count = 0
                         val mapa = mutableMapOf<String, Int>()
 
@@ -149,6 +158,9 @@ class ReportsViewModel : ViewModel() {
         }
     }
 
+    // ========================================================================================
+    // CARGAR PRODUCCIÓN
+    // ========================================================================================
     private fun cargarProduccion() {
         viewModelScope.launch {
             db.getReference("produccion")
@@ -157,8 +169,7 @@ class ReportsViewModel : ViewModel() {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         var count = 0
                         for (child in snapshot.children) {
-                            val p = child.getValue(Produccion::class.java)
-                            if (p != null) count++
+                            if (child.getValue(Produccion::class.java) != null) count++
                         }
                         _totalProduccion.value = count
                     }
